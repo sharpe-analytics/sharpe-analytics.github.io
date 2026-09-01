@@ -4,154 +4,211 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sharpe — Portfolio Analytics for DEGIRO</title>
-<meta name="description" content="A browser extension that adds true time-weighted returns, allocation analytics, dividend tracking and risk analysis to your DEGIRO account. Every calculation runs locally in your browser.">
+<meta name="description" content="A browser extension that adds true time-weighted returns, risk analytics and dividend tracking to DEGIRO. Every figure is computed locally in your browser.">
+<link rel="canonical" href="https://sharpe-analytics.github.io/">
 <link rel="icon" href="assets/favicon.png">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://sharpe-analytics.github.io/">
 <meta property="og:title" content="Sharpe — Portfolio Analytics for DEGIRO">
-<meta property="og:description" content="True time-weighted returns, allocation analytics and risk metrics for your DEGIRO portfolio. Calculated locally, never uploaded.">
-<meta property="og:image" content="assets/portfolio.webp">
+<meta property="og:description" content="True time-weighted returns, risk analytics and dividend tracking for DEGIRO. Computed locally, never uploaded.">
+<meta property="og:image" content="https://sharpe-analytics.github.io/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://sharpe-analytics.github.io/assets/og.jpg">
 <style>
-  @font-face{font-family:'Syne';font-weight:400;font-display:swap;src:url('assets/fonts/syne-latin-400-normal.woff2') format('woff2')}
-  @font-face{font-family:'Syne';font-weight:700;font-display:swap;src:url('assets/fonts/syne-latin-700-normal.woff2') format('woff2')}
-  @font-face{font-family:'Syne';font-weight:800;font-display:swap;src:url('assets/fonts/syne-latin-800-normal.woff2') format('woff2')}
-  @font-face{font-family:'JetBrains Mono';font-weight:400;font-display:swap;src:url('assets/fonts/jetbrains-mono-latin-400-normal.woff2') format('woff2')}
-  @font-face{font-family:'JetBrains Mono';font-weight:500;font-display:swap;src:url('assets/fonts/jetbrains-mono-latin-500-normal.woff2') format('woff2')}
+@font-face{font-family:'Syne';font-weight:400;font-display:swap;src:url('assets/fonts/syne-latin-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Syne';font-weight:700;font-display:swap;src:url('assets/fonts/syne-latin-700-normal.woff2') format('woff2')}
+@font-face{font-family:'Syne';font-weight:800;font-display:swap;src:url('assets/fonts/syne-latin-800-normal.woff2') format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-weight:400;font-display:swap;src:url('assets/fonts/jetbrains-mono-latin-400-normal.woff2') format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-weight:500;font-display:swap;src:url('assets/fonts/jetbrains-mono-latin-500-normal.woff2') format('woff2')}
 
-  :root{
-    --bg:#080D13; --bg2:#111820; --bg3:#1A2230; --border:#232E3C;
-    --text:#E8ECF1; --muted:#7A8BA0; --dim:#2E3B4A;
-    --accent:#4EA8DE; --green:#34D399; --red:#F87171; --gold:#FFD700;
-    --fd:'Syne',system-ui,sans-serif; --fm:'JetBrains Mono',ui-monospace,Menlo,monospace;
-    --r:10px; --maxw:1120px;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:15px;line-height:1.65;
-       -webkit-font-smoothing:antialiased}
-  body::before{content:'';position:fixed;top:0;left:0;right:0;height:2px;background:var(--accent);opacity:.7;z-index:100}
-  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
-  a{color:var(--accent);text-decoration:none}
-  a:hover{text-decoration:underline}
-  h1,h2,h3{font-family:var(--fd);letter-spacing:-.02em;text-wrap:balance;line-height:1.15}
-  section{padding:88px 0;border-top:1px solid var(--border)}
-  .eyebrow{font-family:var(--fm);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+:root{
+  --bg:#080D13; --bg2:#0D141D; --bg3:#141D29; --border:#1D2735; --border2:#283548;
+  --text:#E8ECF1; --muted:#8494A9; --dim:#6E8098;
+  --accent:#4EA8DE; --green:#34D399; --red:#F87171; --gold:#FFD700;
+  --fd:'Syne',system-ui,sans-serif; --fm:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --maxw:1080px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--fd);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+a{color:var(--accent);text-decoration:none}
+h1,h2{letter-spacing:-.025em;text-wrap:balance;line-height:1.08;font-weight:800}
+.mono{font-family:var(--fm)}
+.eyebrow{font-family:var(--fm);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.eyebrow::before{content:'';display:inline-block;width:18px;height:1px;background:var(--accent);vertical-align:4px;margin-right:10px}
+section{padding:120px 0 0}
+.num{font-variant-numeric:tabular-nums}
 
-  /* ── nav ─────────────────────────────────────────── */
-  nav{position:sticky;top:2px;z-index:50;background:rgba(8,13,19,.88);backdrop-filter:blur(10px);
-      border-bottom:1px solid var(--border)}
-  nav .wrap{display:flex;align-items:center;gap:14px;padding-top:14px;padding-bottom:14px}
-  .brand{display:flex;align-items:center;gap:10px;font-family:var(--fd);font-weight:800;font-size:21px;letter-spacing:-.02em;color:var(--text)}
-  .brand img{width:28px;height:28px}
-  .nav-links{display:flex;gap:22px;margin-left:auto;font-size:13px}
-  .nav-links a{color:var(--muted)}
-  .nav-links a:hover{color:var(--text);text-decoration:none}
-  @media(max-width:720px){.nav-links{display:none}}
+/* reveal system (JS-gated: page stays visible without JS) */
+html.js .rev{opacity:0;transform:translateY(16px);transition:opacity .7s cubic-bezier(.2,.6,.2,1) var(--rd,0s),transform .7s cubic-bezier(.2,.6,.2,1) var(--rd,0s),border-color .2s}
+html.js .rev.on{opacity:1;transform:none}
+.rev.d1{--rd:.08s}.rev.d2{--rd:.16s}.rev.d3{--rd:.24s}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  html.js .rev{opacity:1;transform:none;transition:none}
+  *{transition-duration:.01ms!important;animation-duration:.01ms!important}
+}
 
-  /* ── buttons ─────────────────────────────────────── */
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--fm);
-       font-size:13px;padding:11px 20px;border-radius:8px;border:1px solid var(--border);
-       color:var(--muted);background:none;cursor:pointer;transition:border-color .15s,color .15s,background .15s;white-space:nowrap}
-  .btn:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
-  .btn--primary{background:var(--accent);border-color:var(--accent);color:#061018;font-family:var(--fd);font-weight:700;font-size:14px}
-  .btn--primary:hover{filter:brightness(1.12);color:#061018;text-decoration:none}
+/* ── nav ── */
+nav{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 82%,transparent);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+nav .wrap{display:flex;align-items:center;gap:26px;height:60px}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:19px;letter-spacing:-.02em;color:var(--text)}
+.brand img{width:24px;height:24px}
+.nav-links{display:flex;gap:24px;margin-left:auto;font-family:var(--fm);font-size:12.5px}
+.nav-links a{color:var(--muted);transition:color .15s}
+.nav-links a:hover{color:var(--text)}
+nav .btn{padding:8px 15px;font-size:12.5px}
+@media(max-width:760px){.nav-links{display:none}nav .btn{margin-left:auto}}
 
-  /* ── hero ────────────────────────────────────────── */
-  header.hero{padding:96px 0 0;text-align:center;border:0}
-  h1{font-size:clamp(34px,5.6vw,60px);font-weight:800}
-  h1 .accent{color:var(--accent)}
-  .hero p.lede{font-size:16px;line-height:1.75;color:var(--muted);max-width:78ch;margin:22px auto 0}
-  .hero .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:32px}
-  .trust{display:flex;gap:8px 22px;justify-content:center;flex-wrap:wrap;margin-top:26px;
-         font-family:var(--fm);font-size:11.5px;color:var(--muted)}
-  .trust span::before{content:'✓ ';color:var(--green)}
+/* ── buttons ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--fm);font-size:13.5px;
+     padding:12px 22px;border-radius:9px;border:1px solid var(--border2);color:var(--muted);background:none;
+     cursor:pointer;white-space:nowrap;transition:border-color .18s,color .18s,background .18s,transform .18s,box-shadow .18s}
+.btn:hover{border-color:var(--accent);color:var(--text);transform:translateY(-1px)}
+.btn--primary{background:var(--accent);border-color:var(--accent);color:#04101B;font-family:var(--fd);font-weight:700;font-size:14px}
+.btn--primary:hover{color:#04101B;box-shadow:0 6px 24px color-mix(in srgb,var(--accent) 35%,transparent)}
+.btn--gold{border-color:color-mix(in srgb,var(--gold) 45%,transparent);color:var(--gold)}
+.btn--gold:hover{border-color:var(--gold);color:var(--gold);box-shadow:0 6px 24px color-mix(in srgb,var(--gold) 18%,transparent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-  .shot{margin-top:56px;border:1px solid var(--border);border-radius:12px;overflow:hidden;
-        background:var(--bg2);box-shadow:0 30px 80px rgba(0,0,0,.55)}
-  .shot img{display:block;width:100%;height:auto}
-  .shot-note{font-family:var(--fm);font-size:11px;color:var(--dim);text-align:center;margin-top:12px}
+/* ── hero ── */
+.hero{padding:92px 0 0;text-align:center;position:relative}
+.hero::before{content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:min(900px,100vw);height:600px;
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--accent) 9%,transparent),transparent 70%);
+  pointer-events:none;z-index:-1}
+h1{font-size:clamp(38px,6vw,66px)}
+h1 .accent{color:var(--accent)}
+.hero .lede{font-size:16px;color:var(--muted);max-width:52ch;margin:20px auto 0;line-height:1.65}
+.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+.trust{margin-top:22px;font-family:var(--fm);font-size:11px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase}
+.trust b{color:var(--dim);font-weight:400;margin:0 10px}
 
-  /* ── the problem ─────────────────────────────────── */
-  h2{font-size:clamp(24px,3.2vw,34px);font-weight:700;margin-top:10px}
-  .sub{color:var(--muted);max-width:66ch;margin-top:16px;font-size:15.5px}
-  .compare{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:38px}
-  @media(max-width:760px){.compare{grid-template-columns:1fr}}
-  .panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:22px 24px}
-  .panel .eyebrow{display:block;margin-bottom:14px}
-  .panel .big{font-family:var(--fd);font-size:34px;font-weight:800;letter-spacing:-.02em}
-  .panel .cap{font-size:13px;color:var(--muted);margin-top:8px}
-  .panel--bad{border-color:color-mix(in srgb,var(--red) 40%,transparent)}
-  .panel--bad .big{color:var(--red)}
-  .panel--good{border-color:color-mix(in srgb,var(--green) 40%,transparent)}
-  .panel--good .big{color:var(--green)}
+/* chart card */
+.chart-card{margin-top:58px;background:linear-gradient(180deg,var(--bg2),color-mix(in srgb,var(--bg2) 60%,var(--bg)));
+  border:1px solid var(--border);border-radius:16px;padding:22px 24px 18px;text-align:left;
+  box-shadow:0 40px 100px rgba(0,0,0,.5)}
+.chart-head{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.chart-title{font-family:var(--fm);font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.legend{display:flex;gap:18px;margin-left:auto;font-family:var(--fm);font-size:11px;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:2px;vertical-align:3px;margin-right:7px;border-radius:2px}
+.legend .l1 i{background:var(--accent)}
+.legend .l2 i{background:var(--dim)}
+canvas{display:block;width:100%}
+#heroChart{height:340px;margin-top:14px}
+.chips{display:flex;gap:8px 26px;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.chip{font-family:var(--fm)}
+.chip .k{font-size:10px;letter-spacing:.12em;color:var(--dim);text-transform:uppercase;display:block}
+.chip .v{font-size:15px;font-weight:500;margin-top:2px}
+.chip .v.up{color:var(--green)}.chip .v.dn{color:var(--red)}
+.demo-note{font-family:var(--fm);font-size:10px;color:var(--dim);text-align:center;margin-top:14px}
 
-  /* ── features ────────────────────────────────────── */
-  .feat{display:grid;grid-template-columns:0.92fr 1.08fr;gap:52px;align-items:center;margin-top:64px}
-  .feat:first-of-type{margin-top:44px}
-  .feat--flip .feat-text{order:2}
-  @media(max-width:860px){.feat{grid-template-columns:1fr;gap:28px}.feat--flip .feat-text{order:0}}
-  .feat h3{font-size:21px;font-weight:700;margin:10px 0 12px}
-  .feat ul{list-style:none;margin-top:16px;display:flex;flex-direction:column;gap:10px}
-  .feat li{font-size:14px;color:var(--muted);padding-left:20px;position:relative}
-  .feat li::before{content:'';position:absolute;left:0;top:9px;width:7px;height:7px;border-radius:50%;
-                   background:var(--accent);opacity:.75}
-  .feat li b{color:var(--text);font-weight:500}
-  .feat-shot{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--bg2);
-             box-shadow:0 18px 46px rgba(0,0,0,.45)}
-  .feat-shot img{display:block;width:100%;height:auto}
+/* ── section headers ── */
+h2{font-size:clamp(26px,3.4vw,38px);margin-top:14px}
+.sub{color:var(--muted);max-width:56ch;margin-top:14px;font-size:16px}
+.center{text-align:center}
+.center .sub{margin-left:auto;margin-right:auto}
 
-  /* ── privacy spec ────────────────────────────────── */
-  .spec{margin-top:36px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
-  .spec-row{display:grid;grid-template-columns:210px 1fr;gap:24px;padding:18px 24px;border-bottom:1px solid var(--border)}
-  .spec-row:last-child{border-bottom:0}
-  .spec-row:nth-child(odd){background:var(--bg2)}
-  @media(max-width:700px){.spec-row{grid-template-columns:1fr;gap:6px}}
-  .spec-k{font-family:var(--fm);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
-  .spec-v{font-size:14px}
-  .spec-v code{font-family:var(--fm);font-size:.9em;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--text)}
+/* ── problem: seg + morph chart ── */
+.seg{display:inline-flex;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:4px;gap:4px;margin-top:30px}
+.seg button{font-family:var(--fm);font-size:12.5px;padding:9px 18px;border:0;border-radius:7px;background:none;
+  color:var(--muted);cursor:pointer;transition:background .18s,color .18s}
+.seg button[aria-pressed="true"]{background:var(--bg3);color:var(--text)}
+.morph-card{margin-top:26px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:left}
+.morph-top{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;min-height:54px}
+.morph-num{font-family:var(--fd);font-weight:800;font-size:clamp(30px,4vw,44px);letter-spacing:-.02em;
+  transition:opacity .25s,transform .25s}
+.morph-num.out{opacity:0;transform:translateY(8px)}
+.morph-cap{font-size:14px;color:var(--muted);transition:opacity .25s}
+.morph-cap.out{opacity:0}
+#morphChart{height:220px;margin-top:10px}
 
-  /* ── tiers ───────────────────────────────────────── */
-  .tiers{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:38px}
-  @media(max-width:760px){.tiers{grid-template-columns:1fr}}
-  .tier{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:26px}
-  .tier--pro{border-color:color-mix(in srgb,var(--gold) 40%,transparent)}
-  .tier h3{font-size:17px;font-weight:700}
-  .tag{display:inline-block;font-family:var(--fd);font-weight:700;font-size:10px;letter-spacing:.08em;
-       padding:2px 7px;border-radius:4px;border:1px solid color-mix(in srgb,var(--gold) 45%,transparent);
-       color:var(--gold);background:color-mix(in srgb,var(--gold) 12%,transparent);vertical-align:2px;margin-left:8px}
-  .tier ul{list-style:none;margin-top:16px;display:flex;flex-direction:column;gap:9px}
-  .tier li{font-size:13.5px;color:var(--muted);padding-left:18px;position:relative}
-  .tier li::before{content:'·';position:absolute;left:4px;color:var(--dim)}
+/* ── features: tabs ── */
+.tabs{display:inline-flex;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:4px;gap:4px;
+  margin-top:34px;max-width:100%;overflow-x:auto}
+.tabs button{font-family:var(--fm);font-size:13px;padding:10px 20px;border:0;border-radius:7px;background:none;
+  color:var(--muted);cursor:pointer;white-space:nowrap;transition:background .18s,color .18s}
+.tabs button[aria-selected="true"]{background:var(--bg3);color:var(--text)}
+.tab-line{margin:22px auto 0;font-size:15px;color:var(--muted);max-width:64ch;min-height:48px;transition:opacity .25s}
+.tab-line.out{opacity:0}
+.tab-line b{color:var(--text);font-weight:700}
+.tab-shot{margin-top:26px;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--bg2);
+  box-shadow:0 30px 80px rgba(0,0,0,.5);aspect-ratio:1440/880;position:relative}
+.tab-shot img{position:absolute;inset:0;width:100%;height:auto;opacity:0;visibility:hidden;transition:opacity .35s,visibility .35s}
+.tab-shot img.show{opacity:1;visibility:visible}
 
-  /* ── install ─────────────────────────────────────── */
-  .steps{counter-reset:s;list-style:none;margin-top:32px;display:flex;flex-direction:column;gap:16px}
-  .steps li{counter-increment:s;position:relative;padding-left:46px;font-size:15px;color:var(--muted)}
-  .steps li::before{content:counter(s);position:absolute;left:0;top:-1px;width:30px;height:30px;
-    border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;
-    font-family:var(--fm);font-size:12px;color:var(--accent)}
-  .steps li b{color:var(--text);font-weight:500}
+/* ── privacy ── */
+.pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:38px}
+@media(max-width:900px){.pgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.pgrid{grid-template-columns:1fr}}
+.pcell{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;transition:border-color .2s}
+.pcell:hover{border-color:var(--border2)}
+.pcell .k{font-family:var(--fm);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.pcell p{font-size:13.5px;color:var(--muted);margin-top:10px;line-height:1.55}
+.pcell a{border-bottom:1px solid color-mix(in srgb,var(--accent) 40%,transparent)}
 
-  /* ── footer ──────────────────────────────────────── */
-  footer{border-top:1px solid var(--border);padding:44px 0 64px}
-  .foot-top{display:flex;gap:20px;flex-wrap:wrap;align-items:center}
-  .foot-links{display:flex;gap:20px;margin-left:auto;flex-wrap:wrap;font-size:13px}
-  .disclaimer{margin-top:26px;font-size:12px;color:var(--dim);line-height:1.7;max-width:88ch}
+/* ── pricing ── */
+.tiers{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:40px;text-align:left}
+@media(max-width:760px){.tiers{grid-template-columns:1fr}}
+.tier{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:0;transition:border-color .2s}
+.tier:hover{border-color:var(--border2)}
+.tier--pro{border-color:color-mix(in srgb,var(--gold) 30%,transparent)}
+.tier--pro:hover{border-color:color-mix(in srgb,var(--gold) 55%,transparent)}
+.tier h3{font-size:15px;font-weight:700;letter-spacing:.02em}
+.tier .price{font-family:var(--fd);font-weight:800;font-size:38px;letter-spacing:-.02em;margin-top:10px}
+.tier .price small{font-family:var(--fm);font-size:12px;font-weight:400;color:var(--muted);letter-spacing:0}
+.tier ul{list-style:none;margin:18px 0 24px;display:flex;flex-direction:column;gap:9px;flex:1}
+.tier li{font-size:13.5px;color:var(--muted);padding-left:18px;position:relative}
+.tier li::before{content:'';position:absolute;left:0;top:8px;width:8px;height:1.5px;background:var(--dim)}
+.tier--pro li::before{background:color-mix(in srgb,var(--gold) 55%,transparent)}
+.tag{display:inline-block;font-weight:700;font-size:10px;letter-spacing:.1em;padding:2px 8px;border-radius:5px;
+  border:1px solid color-mix(in srgb,var(--gold) 45%,transparent);color:var(--gold);margin-left:8px;vertical-align:1px}
+.cancel{font-family:var(--fm);font-size:11px;color:var(--dim);margin-top:12px}
 
-  /* ── small screens: the hero was 13 lines of centred mono before the CTA ── */
-  @media(max-width:560px){
-    header.hero{padding-top:52px;text-align:left}
-    h1{font-size:29px}
-    .hero p.lede{font-size:14px;line-height:1.7;margin:18px 0 0;max-width:none}
-    .hero .cta{justify-content:stretch;flex-direction:column;margin-top:26px}
-    .hero .cta .btn{width:100%}
-    .trust{justify-content:flex-start;gap:6px 16px;font-size:11px}
-    .shot{margin-top:36px}
-    section{padding:60px 0}
-    .feat{margin-top:44px}
-    .spec-row{padding:16px 18px}
-    .tier,.panel{padding:20px}
-    .wrap{padding:0 18px}
-  }
+/* ── install band ── */
+.band{margin-top:120px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,var(--bg2),var(--bg));padding:72px 0;text-align:center}
+.steps{display:flex;gap:14px 40px;justify-content:center;flex-wrap:wrap;margin-top:26px;font-family:var(--fm);font-size:13px;color:var(--muted)}
+.steps span b{color:var(--accent);font-weight:500;margin-right:9px}
+
+/* ── footer ── */
+footer{padding:48px 0 64px}
+.foot-top{display:flex;gap:20px;flex-wrap:wrap;align-items:center}
+.foot-links{display:flex;gap:22px;margin-left:auto;flex-wrap:wrap;font-family:var(--fm);font-size:12.5px}
+.foot-links a{color:var(--muted)}
+.foot-links a:hover{color:var(--text)}
+.disclaimer{margin-top:28px;font-size:12px;color:var(--dim);line-height:1.7;max-width:86ch}
+
+/* ── mobile ── */
+@media(max-width:360px){.tabs button{padding:12px 6px;font-size:10.5px}}
+@media(max-width:560px){
+  section{padding:76px 0 0}
+  .hero{padding-top:56px;text-align:left}
+  h1{font-size:33px}
+  .hero .lede{margin-left:0}
+  .cta{flex-direction:column}
+  .cta .btn{width:100%}
+  .trust{font-size:10px}
+  .chart-card{margin-top:40px;padding:16px}
+  #heroChart{height:240px}
+  #morphChart{height:180px}
+  .chips{gap:10px 20px}
+  .center{text-align:left}
+  .center .seg,.center .tabs{margin-left:0}
+  .tab-line{margin-left:0}
+  .tabs button{padding:12px 9px;font-size:11px}
+  .seg button{padding:12px 11px;font-size:11px}
+  .tab-line{min-height:76px}
+  .foot-links a{display:inline-block;padding:9px 0}
+  nav .btn{padding:10px 15px}
+  .band{padding:56px 0;margin-top:76px;text-align:left}
+  .band .cta{justify-content:flex-start}
+  .steps{flex-direction:column;align-items:flex-start;gap:12px}
+  .wrap{padding:0 20px}
+}
 </style>
 </head>
 <body>
@@ -162,199 +219,145 @@
     <div class="nav-links">
       <a href="#features">Features</a>
       <a href="#privacy">Privacy</a>
-      <a href="#pricing">Free &amp; PRO</a>
-      <a href="#install">Install</a>
-      <a href="https://github.com/vapeur02/sharpe-degiro-analytics">Source</a>
+      <a href="#pricing">Pricing</a>
+      <a href="https://github.com/vapeur02/sharpe-degiro-analytics">GitHub</a>
     </div>
+    <a class="btn btn--primary" href="https://chromewebstore.google.com/detail/sharpe-portfolio-analytic/jfkggpahncfpbeeiiadiblbifjnbdlfp">Add to Chrome</a>
   </div>
 </nav>
 
 <header class="hero" id="top">
   <div class="wrap">
-    <div class="eyebrow">Browser extension for DEGIRO</div>
-    <h1>Find out what your portfolio<br><span class="accent">actually</span> returned.</h1>
-    <p class="lede">If you invest monthly, DEGIRO's "Total P&amp;L" is distorted by every deposit you make —
-      it cannot tell you whether your decisions were any good. Sharpe adds true time-weighted returns,
-      allocation analytics, dividend tracking and risk metrics to the account you already have.
-      Every figure is calculated in your browser and never leaves your machine.</p>
-    <div class="cta">
+    <div class="eyebrow rev">Browser extension for DEGIRO</div>
+    <h1 class="rev d1">Know what your portfolio<br><span class="accent">actually</span> returned.</h1>
+    <p class="lede rev d2">True time-weighted returns, risk and dividend analytics —
+       computed in your browser, never uploaded.</p>
+    <div class="cta rev d3">
       <a class="btn btn--primary" href="https://chromewebstore.google.com/detail/sharpe-portfolio-analytic/jfkggpahncfpbeeiiadiblbifjnbdlfp">Add to Chrome — free</a>
-      <a class="btn" href="https://github.com/vapeur02/sharpe-degiro-analytics">Read the source</a>
+      <a class="btn btn--gold" href="https://sharpe.lemonsqueezy.com/">Get PRO — €3/month</a>
     </div>
-    <div class="trust">
-      <span>Runs entirely on your machine</span>
-      <span>Read-only access</span>
-      <span>No accounts, no tracking</span>
-      <span>Source is public</span>
+    <div class="trust rev d3">Read-only<b>·</b>No account<b>·</b>Open source</div>
+
+    <div class="chart-card rev d3">
+      <div class="chart-head">
+        <span class="chart-title">Performance — time-weighted return</span>
+        <div class="legend"><span class="l1"><i></i>Your portfolio</span><span class="l2"><i></i>S&amp;P 500</span></div>
+      </div>
+      <canvas id="heroChart" role="img" aria-label="Line chart: portfolio time-weighted return of +41.1% since inception, compared with the S&amp;P 500."></canvas>
+      <div class="chips">
+        <span class="chip"><span class="k">All-time</span><span class="v up num" data-count="41.1" data-fmt="+%1%">+41.1%</span></span>
+        <span class="chip"><span class="k">Annualised</span><span class="v up num" data-count="9.3" data-fmt="+%1%">+9.3%</span></span>
+        <span class="chip"><span class="k">Max drawdown</span><span class="v dn num" data-count="30.5" data-fmt="-%1%">−30.5%</span></span>
+        <span class="chip"><span class="k">Sharpe</span><span class="v num" data-count="0.34" data-fmt="%2">0.34</span></span>
+        <span class="chip"><span class="k">Beta</span><span class="v num" data-count="1.01" data-fmt="%2">1.01</span></span>
+      </div>
     </div>
-    <div class="shot"><img src="assets/portfolio.webp" width="2880" height="1760" alt="The Sharpe dashboard: a time-weighted return chart benchmarked against the S&amp;P 500, allocation breakdown, and a positions table with weight bars and 30-day sparklines."></div>
-    <p class="shot-note">Screenshots show a demo portfolio, not real holdings.</p>
+    <p class="demo-note">Demo portfolio — not real holdings.</p>
   </div>
 </header>
 
-<section id="why">
+<main>
+<section id="why" class="center">
   <div class="wrap">
-    <div class="eyebrow">The problem</div>
-    <h2>Deposits inflate your P&amp;L. Returns don't lie.</h2>
-    <p class="sub">Put €500 in every month and your Total P&amp;L climbs even when every one of your picks is
-      flat, because the number counts your own cash as gains. Time-weighted return removes the cash flows and
-      measures only what your investing decisions did — the same method funds are required to report.</p>
-    <div class="compare">
-      <div class="panel panel--bad">
-        <span class="eyebrow">What DEGIRO shows you</span>
-        <div class="big">+21 448 €</div>
-        <p class="cap">Total P&amp;L. Rises when you deposit, falls when you withdraw, and mixes both with
-          actual performance. Useless for judging your own decisions.</p>
+    <div class="eyebrow rev">The problem</div>
+    <h2 class="rev d1">Deposits inflate your P&amp;L.</h2>
+    <p class="sub rev d2">Total P&amp;L counts your own deposits as gains. Time-weighted return strips
+       them out and measures only your decisions.</p>
+    <div class="seg rev d2" role="group" aria-label="Compare DEGIRO's figure with Sharpe's">
+      <button id="segPnl" aria-pressed="true">What DEGIRO shows</button>
+      <button id="segTwr" aria-pressed="false">What Sharpe shows</button>
+    </div>
+    <div class="morph-card rev d3">
+      <div class="morph-top">
+        <div class="morph-num num" id="morphNum">+21 448 €</div>
+        <div class="morph-cap" id="morphCap">Climbs every time you deposit — even when your picks go nowhere.</div>
       </div>
-      <div class="panel panel--good">
-        <span class="eyebrow">What Sharpe shows you</span>
-        <div class="big">+41.1%</div>
-        <p class="cap">Time-weighted return since inception, with the deposits stripped out — plus annualised
-          return, max drawdown, beta, alpha and Sharpe ratio for whatever window you're looking at.</p>
-      </div>
+      <canvas id="morphChart" role="img" aria-label="Chart toggling between Total P&amp;L in euros and time-weighted return in percent for the same portfolio."></canvas>
     </div>
   </div>
 </section>
 
-<section id="features">
+<section id="features" class="center">
   <div class="wrap">
-    <div class="eyebrow">What you get</div>
-    <h2>Six tabs of analysis DEGIRO doesn't give you.</h2>
-
-    <div class="feat">
-      <div class="feat-text">
-        <div class="eyebrow">Portfolio</div>
-        <h3>One chart, the whole story</h3>
-        <ul>
-          <li><b>Cumulative or daily.</b> The full curve since inception, or a bar per trading day to see which days made your year.</li>
-          <li><b>Benchmark overlays.</b> S&amp;P 500, Euro Stoxx 50 and Nasdaq 100, anchored to the day your portfolio actually started.</li>
-          <li><b>Trade markers</b> so you can see how each buy and sell landed, and drag anywhere to zoom.</li>
-          <li><b>Positions that explain themselves:</b> weight bars, a 30-day sparkline per holding, and click-to-expand detail with average cost, volatility and a full price chart.</li>
-        </ul>
-      </div>
-      <div class="feat-shot"><img src="assets/daily.webp" width="2880" height="1760" loading="lazy" alt="The performance card in Daily mode: green and red bars for each trading day with S&amp;P 500 comparison markers."></div>
+    <div class="eyebrow rev">The product</div>
+    <h2 class="rev d1">The tabs your broker doesn’t have.</h2>
+    <div class="tabs rev d2" role="tablist" aria-label="Feature tabs">
+      <button role="tab" id="tab-portfolio" aria-controls="tabPanel" aria-selected="true" data-tab="portfolio">Portfolio</button>
+      <button role="tab" id="tab-insights" aria-controls="tabPanel" aria-selected="false" tabindex="-1" data-tab="insights">Insights</button>
+      <button role="tab" id="tab-today" aria-controls="tabPanel" aria-selected="false" tabindex="-1" data-tab="today">Today</button>
+      <button role="tab" id="tab-dividends" aria-controls="tabPanel" aria-selected="false" tabindex="-1" data-tab="dividends">Dividends</button>
     </div>
-
-    <div class="feat feat--flip">
-      <div class="feat-text">
-        <div class="eyebrow">Insights</div>
-        <h3>Whether your diversification is real</h3>
-        <ul>
-          <li><b>Portfolio Pulse.</b> Plain-language observations from your own figures — concentration, risk-adjusted trend, drawdown against your high-water mark.</li>
-          <li><b>Correlation matrix</b> across every holding, with weighted average correlation and a principal-component breakdown. Six ETFs that all track the same index is not diversification.</li>
-          <li><b>Risk analysis.</b> Daily Value at Risk at 90/95/99% confidence, plus stress tests against real historical crashes with per-position impact.</li>
-          <li><b>Rate My Portfolio.</b> Five questions about your horizon and goals, then a grade against <em>your</em> objectives rather than a generic template.</li>
-        </ul>
-      </div>
-      <div class="feat-shot"><img src="assets/insights.webp" width="2880" height="1760" loading="lazy" alt="The Insights tab: dividend, currency, realized-gain and fee figures with an auto-generated concentration observation."></div>
+    <div role="tabpanel" id="tabPanel" aria-labelledby="tab-portfolio">
+    <p class="tab-line rev d2" id="tabLine"><b>Cumulative or daily performance,</b> benchmark overlays, trade markers — and positions that explain themselves.</p>
+    <div class="tab-shot rev d3" id="tabShot">
+      <img src="assets/portfolio.webp" data-tab="portfolio" class="show" alt="Sharpe's Portfolio tab: time-weighted return chart with S&amp;P 500 benchmark, allocation breakdown and positions table.">
+      <img src="assets/insights.webp" data-tab="insights" loading="lazy" alt="Sharpe's Insights tab: Portfolio Pulse observations and a correlation matrix across holdings.">
+      <img src="assets/today.webp" data-tab="today" loading="lazy" alt="Sharpe's Today tab: per-position daily moves with contribution to the day's return.">
+      <img src="assets/dividends.webp" data-tab="dividends" loading="lazy" alt="Sharpe's Dividends tab: income history, yield on cost and estimated upcoming payments.">
     </div>
-
-    <div class="feat">
-      <div class="feat-text">
-        <div class="eyebrow">Today</div>
-        <h3>What moved, and what it cost you</h3>
-        <ul>
-          <li><b>Per-position daily change</b> in % and €, with each holding's contribution to the day's return.</li>
-          <li><b>Three views of the same day:</b> a table, a contribution waterfall, or a heatmap sized by weight and coloured by move.</li>
-          <li><b>Replay any past day</b> — the whole tab rebuilt from your transaction history as it stood that morning.</li>
-          <li><b>Daily stats:</b> winning streak, best and worst day of the month, average daily return and win rate.</li>
-        </ul>
-      </div>
-      <div class="feat-shot"><img src="assets/today.webp" width="2880" height="1760" loading="lazy" alt="The Today tab: daily statistics and a movers table showing per-position daily change, weight and contribution."></div>
-    </div>
-
-    <div class="feat feat--flip">
-      <div class="feat-text">
-        <div class="eyebrow">Dividends &amp; Tax</div>
-        <h3>Income you'd otherwise have to total by hand</h3>
-        <ul>
-          <li><b>Every payment DEGIRO ever credited you</b>, totalled all-time and over the trailing 12 months, with a monthly chart and your yield on cost.</li>
-          <li><b>Expected next payments,</b> read from the cadence of your own history — labelled as an estimate, because issuers announce dividends, not extensions.</li>
-          <li><b>Realized P&amp;L</b> from closed positions on FIFO cost basis, and the currency effect on your non-EUR holdings.</li>
-          <li><b>Tax tables</b> for the Netherlands, France, Germany and Belgium, built from your own history and exportable as a PDF.</li>
-        </ul>
-      </div>
-      <div class="feat-shot"><img src="assets/dividends.webp" width="2880" height="1760" loading="lazy" alt="The Dividends tab: income received over 12 months and all-time, yield on cost, a monthly chart and estimated next payments."></div>
     </div>
   </div>
 </section>
 
 <section id="privacy">
   <div class="wrap">
-    <div class="eyebrow">Privacy &amp; security</div>
-    <h2>You should be paranoid about this. So am I.</h2>
-    <p class="sub">An extension that reads your brokerage account deserves scrutiny. Here is exactly what
-      Sharpe does and doesn't do — and because the source is public, you don't have to take my word for it.</p>
-    <div class="spec">
-      <div class="spec-row"><div class="spec-k">Where it runs</div><div class="spec-v">Entirely in your browser. There is no backend, no database and no account to create. Your portfolio data is never transmitted anywhere.</div></div>
-      <div class="spec-row"><div class="spec-k">Account access</div><div class="spec-v">Read-only. Sharpe issues <code>GET</code> requests to DEGIRO's own reporting endpoints — the same ones the website calls. It cannot place, modify or cancel an order.</div></div>
-      <div class="spec-row"><div class="spec-k">Credentials</div><div class="spec-v">Never seen or stored. Sharpe uses the session you already have open; it never asks for your DEGIRO login.</div></div>
-      <div class="spec-row"><div class="spec-k">Dependencies</div><div class="spec-v">Vanilla JavaScript. No npm packages, no frameworks, no minified third-party bundles — nothing that could turn into a supply-chain problem.</div></div>
-      <div class="spec-row"><div class="spec-k">Architecture</div><div class="spec-v">Manifest V3, which means the browser itself forbids remote code execution. The extension cannot download and run new code after you install it.</div></div>
-      <div class="spec-row"><div class="spec-k">Data at rest</div><div class="spec-v">Cached locally so the dashboard opens instantly, and cleared automatically after 24 hours.</div></div>
-      <div class="spec-row"><div class="spec-k">Verify it yourself</div><div class="spec-v">Every file in the <a href="https://github.com/vapeur02/sharpe-degiro-analytics">public repository</a> is exactly what ships to the Chrome Web Store. Clone it, read it, load it unpacked.</div></div>
+    <div class="eyebrow rev">Privacy</div>
+    <h2 class="rev d1">You should be paranoid. So am I.</h2>
+    <div class="pgrid">
+      <div class="pcell rev"><span class="k">No backend</span><p>Everything computes locally. Your data is never transmitted, ever.</p></div>
+      <div class="pcell rev d1"><span class="k">Read-only</span><p>GET requests to DEGIRO’s own endpoints. It cannot touch an order.</p></div>
+      <div class="pcell rev d2"><span class="k">No credentials</span><p>Uses the session you already have. Never sees your login.</p></div>
+      <div class="pcell rev d3"><span class="k">Open source</span><p>The <a href="https://github.com/vapeur02/sharpe-degiro-analytics">repository</a> is exactly what ships. Read it.</p></div>
     </div>
   </div>
 </section>
 
-<section id="pricing">
+<section id="pricing" class="center">
   <div class="wrap">
-    <div class="eyebrow">Free &amp; PRO</div>
-    <h2>The core is free. Always.</h2>
-    <p class="sub">Everything you need to answer "how am I actually doing" costs nothing. PRO unlocks the
-      heavier analysis and funds keeping the extension working when DEGIRO changes their platform.</p>
+    <div class="eyebrow rev">Pricing</div>
+    <h2 class="rev d1">The math is free. The analysis is €3.</h2>
     <div class="tiers">
-      <div class="tier">
-        <h3>Free</h3>
+      <div class="tier rev d2">
+        <h3>FREE</h3>
+        <div class="price">€0</div>
         <ul>
-          <li>True time-weighted return chart, all periods</li>
-          <li>Annualised return, max drawdown, beta, alpha, Sharpe ratio</li>
-          <li>Benchmark overlays and trade markers</li>
-          <li>Allocation by holding, geography, asset class and currency</li>
-          <li>Positions table with weight bars and sparklines</li>
-          <li>Closed-position and fee tracking, currency effect</li>
-          <li>Dividend income totals and monthly chart</li>
-          <li>Daily statistics and Portfolio Pulse</li>
+          <li>True time-weighted return, all periods</li>
+          <li>Benchmarks, trade markers, drag-to-zoom</li>
+          <li>Annualised return, drawdown, beta, alpha, Sharpe</li>
+          <li>Allocation, positions, dividend totals</li>
         </ul>
+        <a class="btn" href="https://chromewebstore.google.com/detail/sharpe-portfolio-analytic/jfkggpahncfpbeeiiadiblbifjnbdlfp">Add to Chrome</a>
       </div>
-      <div class="tier tier--pro">
-        <h3>Sharpe<span class="tag">PRO</span></h3>
+      <div class="tier tier--pro rev d3">
+        <h3>SHARPE<span class="tag">PRO</span></h3>
+        <div class="price">€3 <small>/ month</small></div>
         <ul>
-          <li>Today's Movers, with waterfall and heatmap views</li>
-          <li>Watchlist tracking with correlation and trend signals</li>
-          <li>Per-position price charts with your trades marked</li>
-          <li>Correlation matrix, weighted average correlation, PCA</li>
-          <li>Value at Risk and scenario stress tests</li>
-          <li>Full Rate My Portfolio analysis</li>
-          <li>Per-holding dividend breakdown</li>
-          <li>Tax tables for NL, FR, DE and BE</li>
-          <li>CSV export across every table and chart</li>
+          <li>Correlation matrix, PCA, Value at Risk, stress tests</li>
+          <li>Today’s Movers — waterfall &amp; heatmap views</li>
+          <li>Watchlist, per-position charts, Rate My Portfolio</li>
+          <li>Tax tables (NL · FR · DE · BE) and CSV export</li>
         </ul>
+        <a class="btn btn--gold" href="https://sharpe.lemonsqueezy.com/">Get PRO</a>
+        <div class="cancel">Cancel anytime.</div>
       </div>
     </div>
   </div>
 </section>
 
-<section id="install">
+<div class="band" id="install">
   <div class="wrap">
-    <div class="eyebrow">Install</div>
-    <h2>Two minutes, no signup.</h2>
-    <ol class="steps">
-      <li><b>Install from the Chrome Web Store</b> — <a href="https://chromewebstore.google.com/detail/sharpe-portfolio-analytic/jfkggpahncfpbeeiiadiblbifjnbdlfp">Sharpe: Portfolio Analytics for DEGIRO</a>.</li>
-      <li><b>Pin it</b> to your toolbar so it's one click away.</li>
-      <li><b>Log in to DEGIRO</b> as you normally would, at <code>trader.degiro.nl</code> or your local domain.</li>
-      <li><b>Open the extension.</b> The first sync takes 20–30 seconds while it fetches your price history; after that the dashboard opens instantly.</li>
-    </ol>
-    <p class="sub" style="margin-top:30px">Prefer to run it from source? Clone the
-      <a href="https://github.com/vapeur02/sharpe-degiro-analytics">repository</a>, open
-      <code>chrome://extensions</code>, enable Developer mode and choose <b>Load unpacked</b>.
-      Firefox support is planned.</p>
-    <div class="cta" style="justify-content:flex-start;margin-top:36px">
+    <h2 class="rev">Two minutes. No signup.</h2>
+    <div class="steps rev d1">
+      <span><b>01</b>Install from the Chrome Web Store</span>
+      <span><b>02</b>Log in to DEGIRO as usual</span>
+      <span><b>03</b>Open the extension</span>
+    </div>
+    <div class="cta rev d2">
       <a class="btn btn--primary" href="https://chromewebstore.google.com/detail/sharpe-portfolio-analytic/jfkggpahncfpbeeiiadiblbifjnbdlfp">Add to Chrome — free</a>
-      <a class="btn" href="https://ko-fi.com/sharpe_dev">Support the project</a>
     </div>
   </div>
-</section>
+</div>
+</main>
 
 <footer>
   <div class="wrap">
@@ -362,6 +365,7 @@
       <a class="brand" href="#top"><img src="assets/logo.png" alt="">Sharpe</a>
       <div class="foot-links">
         <a href="https://chromewebstore.google.com/detail/sharpe-portfolio-analytic/jfkggpahncfpbeeiiadiblbifjnbdlfp">Chrome Web Store</a>
+        <a href="https://sharpe.lemonsqueezy.com/">PRO</a>
         <a href="https://github.com/vapeur02/sharpe-degiro-analytics">Source</a>
         <a href="https://github.com/vapeur02/sharpe-degiro-analytics/issues">Report a bug</a>
         <a href="https://ko-fi.com/sharpe_dev">Ko-fi</a>
@@ -370,10 +374,232 @@
     <p class="disclaimer">Sharpe is a community-built tool and is not affiliated with, endorsed by, or
       connected to DEGIRO or flatexDEGIRO Bank AG. All metrics are calculated locally for informational
       purposes only and do not constitute financial advice. Tax tables are informational and are not a
-      substitute for professional advice — check them against your own records before filing. Screenshots
-      on this page show a demo portfolio.</p>
+      substitute for professional advice. Charts and screenshots on this page show a demo portfolio.</p>
   </div>
 </footer>
 
+<script>
+'use strict';
+document.documentElement.classList.add('js');
+var SERIES = {"twr":[0,31,23,24,27,38,58,69,64,78,67,59,66,80,57,83,69,72,44,36,20,24,31,28,28,26,7,11,-2,-12,-14,-24,-33,-30,-51,-40,-57,-29,-47,-49,-21,-43,-60,-89,-98,-115,-141,-174,-172,-176,-201,-220,-225,-215,-219,-224,-234,-244,-239,-251,-241,-232,-228,-216,-190,-179,-170,-144,-164,-159,-155,-166,-168,-156,-135,-110,-114,-105,-117,-123,-123,-119,-109,-71,-49,-83,-105,-96,-100,-81,-95,-113,-116,-110,-105,-125,-117,-127,-131,-120,-98,-134,-125,-100,-81,-92,-97,-66,-65,-81,-73,-84,-85,-111,-115,-130,-129,-117,-131,-153,-129,-152,-158,-151,-175,-174,-158,-162,-127,-149,-167,-159,-161,-169,-156,-161,-177,-143,-155,-154,-151,-128,-125,-88,-86,-53,-73,-38,-60,-45,-30,-6,10,6,1,23,26,34,39,15,14,4,-7,9,26,36,62,88,94,86,103,90,81,108,124,126,172,138,119,139,155,142,136,159,155,160,157,139,185,194,199,173,175,197,179,162,155,178,184,210,194,215,181,188,187,191,159,156,146,142,143,153,146,118,155,137,118,125,161,144,166,149,167,151,193,217,219,227,217,234,234,231,238,273,298,305,334,355,368,360,350,369,349,337,333,349,359,392,417,412],"sp":[0,26,19,45,60,57,51,36,44,30,28,21,21,22,7,4,-9,1,-15,-18,-41,-20,-14,-17,-38,-21,-25,-18,-37,-37,-44,-30,-17,-18,-22,-22,-30,-26,-34,-31,-58,-49,-44,-63,-71,-83,-94,-116,-147,-152,-165,-172,-164,-177,-173,-175,-192,-198,-180,-189,-186,-180,-169,-165,-172,-168,-158,-155,-161,-138,-135,-133,-135,-114,-109,-98,-107,-92,-105,-94,-88,-82,-66,-77,-79,-71,-40,-33,-35,-44,-54,-57,-70,-64,-68,-71,-74,-71,-70,-65,-58,-66,-67,-74,-64,-45,-48,-62,-80,-65,-64,-75,-90,-89,-87,-101,-99,-98,-103,-83,-76,-83,-76,-77,-92,-83,-80,-48,-30,-14,1,8,20,22,19,31,44,42,29,9,17,25,26,43,42,41,46,28,42,18,39,42,53,70,69,67,61,48,59,59,55,55,69,76,50,56,46,61,77,94,95,84,70,68,38,48,65,92,81,53,46,46,61,73,99,107,107,107,116,114,137,157,147,164,186,227,243,251,249,262,265,282,265,283,310,311,295,333,331,337,347,363,352,359,330,342,351,366,373,391,412,422,466,448,408,398,399,407,455,437,445,458,449,499,483,504,509,547,537,570,548,560,551,556,550,503,507,493,513,490],"pnl":[0,6,3,3,6,17,40,55,47,72,50,33,51,84,24,98,55,65,-30,-60,-119,-105,-77,-89,-87,-100,-192,-173,-239,-297,-308,-367,-422,-403,-545,-467,-586,-387,-522,-536,-313,-490,-630,-876,-953,-1108,-1343,-1651,-1633,-1675,-1927,-2127,-2177,-2063,-2109,-2169,-2286,-2400,-2345,-2490,-2369,-2254,-2195,-2041,-1678,-1527,-1398,-1023,-1320,-1234,-1180,-1348,-1386,-1184,-851,-446,-511,-359,-559,-659,-662,-598,-413,265,673,38,-374,-200,-275,96,-187,-533,-588,-479,-366,-781,-631,-829,-921,-680,-204,-990,-788,-223,196,-38,-165,557,587,196,407,130,97,-538,-645,-1026,-990,-686,-1045,-1634,-998,-1612,-1761,-1583,-2236,-2203,-1765,-1859,-887,-1518,-2027,-1788,-1849,-2089,-1690,-1847,-2346,-1291,-1673,-1628,-1530,-826,-716,461,517,1597,944,2064,1365,1865,2345,3152,3699,3550,3384,4142,4248,4526,4718,3860,3815,3466,3075,3639,4269,4618,5582,6543,6743,6438,7097,6588,6278,7265,7904,7969,9717,8425,7669,8445,9074,8587,8359,9259,9073,9272,9154,8430,10300,10688,10863,9827,9874,10795,10047,9333,9057,10038,10282,11390,10678,11585,10126,10438,10399,10579,9182,9056,8618,8416,8451,8936,8589,7374,8990,8180,7351,7654,9287,8523,9522,8771,9575,8842,10776,11907,12012,12397,11904,12741,12730,12587,12936,14618,15800,16135,17561,18559,19184,18816,18330,19256,18259,17669,17491,18273,18780,20440,21705,21448]};
+var RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- tiny chart renderer ---------- */
+function makeChart(canvas){
+  var ctx = canvas.getContext('2d'), dpr = Math.min(devicePixelRatio||1, 2), W=0, H=0;
+  function size(){
+    var r = canvas.getBoundingClientRect();
+    if(!r.width) return;
+    W = r.width; H = r.height;
+    canvas.width = W*dpr; canvas.height = H*dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  size();
+  return {ctx:ctx, size:size, w:function(){return W}, h:function(){return H}};
+}
+function ease(t){ return t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2 }
+var css = getComputedStyle(document.documentElement);
+function tok(n){ return css.getPropertyValue(n).trim() }
+var C = {accent:tok('--accent'), dim:tok('--dim'), border:tok('--border'),
+         green:tok('--green'), text:tok('--text'), muted:tok('--muted')};
+
+function drawSeries(ch, series, opts){
+  var ctx=ch.ctx, W=ch.w(), H=ch.h();
+  if(!W) return;
+  var padL=46, padR=16, padT=12, padB=22;
+  var iw=W-padL-padR, ih=H-padT-padB;
+  ctx.clearRect(0,0,W,H);
+  var min=opts.min, max=opts.max;
+  function X(i,n){ return padL + iw*i/(n-1) }
+  function Y(v){ return padT + ih*(1-(v-min)/(max-min)) }
+  /* grid + labels */
+  ctx.font='10px JetBrains Mono, monospace';
+  ctx.fillStyle=C.dim; ctx.strokeStyle=C.border; ctx.lineWidth=1;
+  opts.ticks.forEach(function(tv){
+    var y=Y(tv);
+    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(W-padR,y); ctx.stroke();
+    ctx.fillText(opts.fmt(tv), 4, y+3);
+  });
+  /* lines */
+  series.forEach(function(s){
+    var n=s.data.length, upto=Math.max(2, Math.floor(n*(s.prog!=null?s.prog:1)));
+    if(s.fill){
+      var g=ctx.createLinearGradient(0,padT,0,H-padB);
+      g.addColorStop(0, s.color+'2E'); g.addColorStop(1, s.color+'00');
+      ctx.beginPath(); ctx.moveTo(X(0,n), Y(s.data[0]));
+      for(var i=1;i<upto;i++) ctx.lineTo(X(i,n), Y(s.data[i]));
+      ctx.lineTo(X(upto-1,n), H-padB); ctx.lineTo(padL, H-padB); ctx.closePath();
+      ctx.fillStyle=g; ctx.fill();
+    }
+    ctx.beginPath();
+    ctx.setLineDash(s.dash||[]);
+    ctx.strokeStyle=s.color; ctx.lineWidth=s.width||2; ctx.lineJoin='round';
+    ctx.moveTo(X(0,n), Y(s.data[0]));
+    for(var j=1;j<upto;j++) ctx.lineTo(X(j,n), Y(s.data[j]));
+    ctx.stroke(); ctx.setLineDash([]);
+    if(s.dot && upto===n){
+      var lx=X(n-1,n), ly=Y(s.data[n-1]);
+      ctx.beginPath(); ctx.arc(lx,ly,3.5,0,7); ctx.fillStyle=s.color; ctx.fill();
+      ctx.beginPath(); ctx.arc(lx,ly,7,0,7); ctx.fillStyle=s.color+'33'; ctx.fill();
+    }
+  });
+}
+
+/* ---------- hero chart ---------- */
+var twr = SERIES.twr.map(function(v){return v/10});
+var sp  = SERIES.sp.map(function(v){return v/10});
+var heroC = makeChart(document.getElementById('heroChart'));
+var heroMin = Math.min.apply(null, twr.concat(sp))-4;
+var heroMax = Math.max.apply(null, twr.concat(sp))+4;
+function pct(v){ return (v>0?'+':'')+Math.round(v)+'%' }
+var heroState = {p1:RM?1:0, p2:RM?1:0};
+function heroDraw(){
+  drawSeries(heroC, [
+    {data:sp,  color:C.dim,    width:1.5, dash:[5,4], prog:heroState.p2},
+    {data:twr, color:C.accent, width:2,   fill:true, dot:true, prog:heroState.p1}
+  ], {min:heroMin, max:heroMax, ticks:[-20,0,20,40], fmt:pct});
+}
+function animHero(){
+  var t0=performance.now(), D1=1700, D2=2100;
+  (function f(now){
+    var e=now-t0;
+    heroState.p1=ease(Math.min(1,e/D1));
+    heroState.p2=e<350?0:ease(Math.min(1,(e-350)/D2));
+    heroDraw();
+    if(e<D2+350) requestAnimationFrame(f);
+  })(t0);
+}
+
+/* ---------- count-up chips ---------- */
+function fmtChip(fmt, v){
+  if(fmt==='%2') return v.toFixed(2);
+  var s=v.toFixed(1)+'%';
+  return fmt.replace('%1%', s).replace('-','−').replace('+','+');
+}
+function countUp(el){
+  var target=parseFloat(el.dataset.count), fmt=el.dataset.fmt, D=1100, t0=performance.now();
+  if(RM){ el.textContent=fmtChip(fmt,target); return }
+  (function f(now){
+    var t=Math.min(1,(now-t0)/D);
+    el.textContent=fmtChip(fmt, target*ease(t));
+    if(t<1) requestAnimationFrame(f);
+  })(t0);
+}
+
+/* ---------- morph chart (problem section) ---------- */
+var pnl = SERIES.pnl;
+function norm(a){
+  var mn=Math.min.apply(null,a), mx=Math.max.apply(null,a);
+  return a.map(function(v){return (v-mn)/(mx-mn)});
+}
+var nPnl=norm(pnl), nTwr=norm(twr);
+var morphC = makeChart(document.getElementById('morphChart'));
+var morphT = 0, morphTarget = 0, morphAnim = null;
+var pnlTicks=[0,10000,20000], twrTicks=[-20,0,20,40];
+var pnlMin=Math.min.apply(null,pnl), pnlMax=Math.max.apply(null,pnl);
+var twrMin=Math.min.apply(null,twr), twrMax=Math.max.apply(null,twr);
+function morphDraw(){
+  var t=morphT, data=nPnl.map(function(v,i){return v+(nTwr[i]-v)*t});
+  var ticks, fmt;
+  if(t<0.5){ ticks=pnlTicks.map(function(v){return (v-pnlMin)/(pnlMax-pnlMin)});
+             fmt=function(v){ var eu=Math.round((v*(pnlMax-pnlMin)+pnlMin)/1000); return (eu>0?'+':'')+eu+'k €' }; }
+  else     { ticks=twrTicks.map(function(v){return (v-twrMin)/(twrMax-twrMin)});
+             fmt=function(v){ return pct(v*(twrMax-twrMin)+twrMin) }; }
+  drawSeries(morphC, [{data:data, color:t<0.5?C.muted:C.green, width:2, fill:true, dot:true}],
+             {min:-0.04, max:1.06, ticks:ticks, fmt:fmt});
+}
+function morphTo(target){
+  morphTarget=target;
+  if(RM){ morphT=target; morphDraw(); return }
+  if(morphAnim) cancelAnimationFrame(morphAnim);
+  var from=morphT, t0=performance.now(), D=550;
+  (function f(now){
+    var t=Math.min(1,(now-t0)/D);
+    morphT=from+(morphTarget-from)*ease(t);
+    morphDraw();
+    if(t<1) morphAnim=requestAnimationFrame(f);
+  })(t0);
+}
+var NUM={pnl:'+21 448 €', twr:'+41.1%'}, CAP={
+  pnl:'Climbs every time you deposit — even when your picks go nowhere.',
+  twr:'Deposits stripped out. The same method funds are required to report.'};
+var morphNum=document.getElementById('morphNum'), morphCap=document.getElementById('morphCap');
+function setMode(mode){
+  document.getElementById('segPnl').setAttribute('aria-pressed', mode==='pnl');
+  document.getElementById('segTwr').setAttribute('aria-pressed', mode==='twr');
+  morphNum.classList.add('out'); morphCap.classList.add('out');
+  setTimeout(function(){
+    morphNum.textContent=NUM[mode]; morphCap.textContent=CAP[mode];
+    morphNum.style.color = mode==='twr' ? C.green : C.text;
+    morphNum.classList.remove('out'); morphCap.classList.remove('out');
+  }, RM?0:220);
+  morphTo(mode==='twr'?1:0);
+}
+document.getElementById('segPnl').addEventListener('click',function(){setMode('pnl')});
+document.getElementById('segTwr').addEventListener('click',function(){setMode('twr')});
+
+/* ---------- feature tabs ---------- */
+var TABLINES={
+  portfolio:'<b>Cumulative or daily performance,</b> benchmark overlays, trade markers — and positions that explain themselves.',
+  insights:'<b>Correlation matrix, Value at Risk, stress tests.</b> Whether your diversification is real — in plain language.',
+  today:'<b>Every position’s move and what it contributed</b> — as a table, a waterfall or a heatmap.',
+  dividends:'<b>Every payment ever credited,</b> what’s coming next, and tax tables for NL · FR · DE · BE.'};
+var tabBtns=[].slice.call(document.querySelectorAll('.tabs [role="tab"]'));
+var tabImgs=[].slice.call(document.querySelectorAll('.tab-shot img'));
+var tabLine=document.getElementById('tabLine');
+var tabPanel=document.getElementById('tabPanel');
+function setTab(name){
+  tabBtns.forEach(function(b){
+    var on=b.dataset.tab===name;
+    b.setAttribute('aria-selected', on);
+    b.tabIndex = on?0:-1;
+  });
+  tabPanel.setAttribute('aria-labelledby','tab-'+name);
+  tabImgs.forEach(function(im){ im.classList.toggle('show', im.dataset.tab===name) });
+  tabLine.classList.add('out');
+  setTimeout(function(){ tabLine.innerHTML=TABLINES[name]; tabLine.classList.remove('out') }, RM?0:200);
+}
+tabBtns.forEach(function(b,i){
+  b.addEventListener('click',function(){ setTab(b.dataset.tab) });
+  b.addEventListener('keydown',function(e){
+    var n;
+    if(e.key==='ArrowRight') n=(i+1)%tabBtns.length;
+    else if(e.key==='ArrowLeft') n=(i+tabBtns.length-1)%tabBtns.length;
+    else if(e.key==='Home') n=0;
+    else if(e.key==='End') n=tabBtns.length-1;
+    else return;
+    e.preventDefault();
+    tabBtns[n].focus(); setTab(tabBtns[n].dataset.tab);
+  });
+});
+
+/* ---------- reveals ---------- */
+var io=new IntersectionObserver(function(es){
+  es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('on'); io.unobserve(e.target) } });
+},{threshold:.15});
+document.querySelectorAll('.rev').forEach(function(el){ io.observe(el) });
+
+/* hero chart + chips fire once visible */
+var fired=false;
+var io2=new IntersectionObserver(function(es){
+  es.forEach(function(e){
+    if(e.isIntersecting && !fired){
+      fired=true;
+      if(RM){ heroDraw(); } else { animHero(); }
+      document.querySelectorAll('.chip .v').forEach(countUp);
+      io2.disconnect();
+    }
+  });
+},{threshold:.3});
+io2.observe(document.querySelector('.chart-card'));
+morphDraw();
+
+/* redraw on resize */
+var rt;
+addEventListener('resize',function(){
+  clearTimeout(rt);
+  rt=setTimeout(function(){ heroC.size(); morphC.size(); if(fired) heroDraw(); morphDraw(); },120);
+});
+</script>
 </body>
 </html>
