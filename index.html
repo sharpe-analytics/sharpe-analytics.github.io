@@ -17,9 +17,10 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://sharpe-analytics.github.io/assets/og.jpg">
 <style>
-@font-face{font-family:'Syne';font-weight:400;font-display:swap;src:url('assets/fonts/syne-latin-400-normal.woff2') format('woff2')}
-@font-face{font-family:'Syne';font-weight:700;font-display:swap;src:url('assets/fonts/syne-latin-700-normal.woff2') format('woff2')}
 @font-face{font-family:'Syne';font-weight:800;font-display:swap;src:url('assets/fonts/syne-latin-800-normal.woff2') format('woff2')}
+@font-face{font-family:'Geist';font-weight:400;font-display:swap;src:url('assets/fonts/geist-latin-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Geist';font-weight:700;font-display:swap;src:url('assets/fonts/geist-latin-700-normal.woff2') format('woff2')}
+@font-face{font-family:'Geist';font-weight:800;font-display:swap;src:url('assets/fonts/geist-latin-800-normal.woff2') format('woff2')}
 @font-face{font-family:'JetBrains Mono';font-weight:400;font-display:swap;src:url('assets/fonts/jetbrains-mono-latin-400-normal.woff2') format('woff2')}
 @font-face{font-family:'JetBrains Mono';font-weight:500;font-display:swap;src:url('assets/fonts/jetbrains-mono-latin-500-normal.woff2') format('woff2')}
 
@@ -27,7 +28,7 @@
   --bg:#080D13; --bg2:#0D141D; --bg3:#141D29; --border:#1D2735; --border2:#283548;
   --text:#E8ECF1; --muted:#8494A9; --dim:#6E8098;
   --accent:#4EA8DE; --green:#34D399; --red:#F87171; --gold:#FFD700;
-  --fd:'Syne',system-ui,sans-serif; --fm:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --fd:'Geist',system-ui,sans-serif; --fm:'JetBrains Mono',ui-monospace,Menlo,monospace;
   --maxw:1080px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -56,7 +57,7 @@ html.js .rev.on{opacity:1;transform:none}
 nav{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 82%,transparent);
     backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
 nav .wrap{display:flex;align-items:center;gap:26px;height:60px}
-.brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:19px;letter-spacing:-.02em;color:var(--text)}
+.brand{display:flex;align-items:center;gap:9px;font-family:'Syne',system-ui,sans-serif;font-weight:800;font-size:19px;letter-spacing:-.02em;color:var(--text)}
 .brand img{width:24px;height:24px}
 .nav-links{display:flex;gap:24px;margin-left:auto;font-family:var(--fm);font-size:12.5px}
 .nav-links a{color:var(--muted);transition:color .15s}
