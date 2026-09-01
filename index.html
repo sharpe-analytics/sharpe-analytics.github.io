@@ -99,6 +99,7 @@ h1 .accent{color:var(--accent)}
 .legend .l1 i{background:var(--accent)}
 .legend .l2 i{background:var(--dim)}
 canvas{display:block;width:100%}
+#heroChart,#morphChart{cursor:crosshair;touch-action:pan-y}
 #heroChart{height:340px;margin-top:14px}
 .chips{display:flex;gap:8px 26px;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
 .chip{font-family:var(--fm)}
@@ -444,6 +445,61 @@ function drawSeries(ch, series, opts){
       ctx.beginPath(); ctx.arc(lx,ly,7,0,7); ctx.fillStyle=s.color+'33'; ctx.fill();
     }
   });
+  /* hover crosshair + readout */
+  var hv=opts.hover;
+  if(hv && hv.i>=0){
+    var hn=series[0].data.length, hx=X(hv.i,hn);
+    ctx.save();
+    ctx.strokeStyle=C.dim; ctx.globalAlpha=.45; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(hx,padT); ctx.lineTo(hx,H-padB); ctx.stroke();
+    ctx.restore();
+    hv.entries.forEach(function(e){
+      var ey=Y(e.v);
+      ctx.beginPath(); ctx.arc(hx,ey,6.5,0,7); ctx.fillStyle=e.color+'2E'; ctx.fill();
+      ctx.beginPath(); ctx.arc(hx,ey,3,0,7); ctx.fillStyle=e.color; ctx.fill();
+    });
+    ctx.font='10.5px JetBrains Mono, monospace';
+    var segs=[{t:hv.date, c:C.muted}].concat(hv.entries.map(function(e){
+      return {t:e.text, c:e.tcolor||e.color, dot:e.color}}));
+    var padX=10, gap=13, dotW=10;
+    var pw=padX*2+gap*(segs.length-1);
+    segs.forEach(function(sg){ pw+=ctx.measureText(sg.t).width+(sg.dot?dotW:0) });
+    var ph=24, px=Math.max(padL, Math.min(W-padR-pw, hx-pw/2)), py=padT+2;
+    ctx.fillStyle='#141D29'; ctx.strokeStyle=C.border; ctx.lineWidth=1;
+    ctx.beginPath();
+    if(ctx.roundRect) ctx.roundRect(px,py,pw,ph,6); else ctx.rect(px,py,pw,ph);
+    ctx.fill(); ctx.stroke();
+    var tx=px+padX, ty=py+ph/2+3.5;
+    segs.forEach(function(sg){
+      if(sg.dot){ ctx.beginPath(); ctx.arc(tx+3,ty-3.5,3,0,7); ctx.fillStyle=sg.dot; ctx.fill(); tx+=dotW; }
+      ctx.fillStyle=sg.c; ctx.fillText(sg.t,tx,ty);
+      tx+=ctx.measureText(sg.t).width+gap;
+    });
+  }
+}
+
+/* index -> calendar date (weekly series from 4 Oct 2021) */
+var T0=Date.UTC(2021,9,4), MOS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+function dateAt(i){
+  var d=new Date(T0+i*6048e5);
+  return d.getUTCDate()+' '+MOS[d.getUTCMonth()]+' '+d.getUTCFullYear();
+}
+function fmt1(v){ return (v>0?'+':v<0?'\u2212':'')+Math.abs(v).toFixed(1)+'%' }
+function fmtEur(v){
+  return (v<0?'\u2212':'+')+Math.abs(Math.round(v)).toString().replace(/\B(?=(\d{3})+$)/g,' ')+' \u20AC';
+}
+function wireHover(canvas, n, set){
+  function ev(e){
+    var r=canvas.getBoundingClientRect();
+    if(r.width<80) return;
+    var cx=(e.touches&&e.touches.length?e.touches[0].clientX:e.clientX)-r.left;
+    var i=Math.round((cx-46)/(r.width-46-16)*(n-1));
+    set(Math.max(0,Math.min(n-1,i)));
+  }
+  canvas.addEventListener('mousemove',ev);
+  canvas.addEventListener('mouseleave',function(){ set(-1) });
+  canvas.addEventListener('touchmove',ev,{passive:true});
+  canvas.addEventListener('touchend',function(){ set(-1) });
 }
 
 /* ---------- hero chart ---------- */
@@ -454,11 +510,19 @@ var heroMin = Math.min.apply(null, twr.concat(sp))-4;
 var heroMax = Math.max.apply(null, twr.concat(sp))+4;
 function pct(v){ return (v>0?'+':'')+Math.round(v)+'%' }
 var heroState = {p1:RM?1:0, p2:RM?1:0};
+var heroHoverI = -1;
 function heroDraw(){
+  var hover=null;
+  if(heroHoverI>=0 && heroState.p1>=1){
+    hover={i:heroHoverI, date:dateAt(heroHoverI), entries:[
+      {v:twr[heroHoverI], color:C.accent, text:'YOU '+fmt1(twr[heroHoverI])},
+      {v:sp[heroHoverI],  color:C.dim, tcolor:C.muted, text:'S&P '+fmt1(sp[heroHoverI])}
+    ]};
+  }
   drawSeries(heroC, [
     {data:sp,  color:C.dim,    width:1.5, dash:[5,4], prog:heroState.p2},
-    {data:twr, color:C.accent, width:2,   fill:true, dot:true, prog:heroState.p1}
-  ], {min:heroMin, max:heroMax, ticks:[-20,0,20,40], fmt:pct});
+    {data:twr, color:C.accent, width:2,   fill:true, dot:!hover, prog:heroState.p1}
+  ], {min:heroMin, max:heroMax, ticks:[-20,0,20,40], fmt:pct, hover:hover});
 }
 function animHero(){
   var t0=performance.now(), D1=1700, D2=2100;
@@ -499,15 +563,23 @@ var morphT = 0, morphTarget = 0, morphAnim = null;
 var pnlTicks=[0,10000,20000], twrTicks=[-20,0,20,40];
 var pnlMin=Math.min.apply(null,pnl), pnlMax=Math.max.apply(null,pnl);
 var twrMin=Math.min.apply(null,twr), twrMax=Math.max.apply(null,twr);
+var morphHoverI = -1;
 function morphDraw(){
   var t=morphT, data=nPnl.map(function(v,i){return v+(nTwr[i]-v)*t});
+  var hover=null;
+  if(morphHoverI>=0 && (t===0||t===1)){
+    var hi=morphHoverI;
+    hover = t<0.5
+      ? {i:hi, date:dateAt(hi), entries:[{v:nPnl[hi], color:C.muted, tcolor:C.text, text:fmtEur(pnl[hi])}]}
+      : {i:hi, date:dateAt(hi), entries:[{v:nTwr[hi], color:C.green, text:fmt1(twr[hi])}]};
+  }
   var ticks, fmt;
   if(t<0.5){ ticks=pnlTicks.map(function(v){return (v-pnlMin)/(pnlMax-pnlMin)});
              fmt=function(v){ var eu=Math.round((v*(pnlMax-pnlMin)+pnlMin)/1000); return (eu>0?'+':'')+eu+'k €' }; }
   else     { ticks=twrTicks.map(function(v){return (v-twrMin)/(twrMax-twrMin)});
              fmt=function(v){ return pct(v*(twrMax-twrMin)+twrMin) }; }
-  drawSeries(morphC, [{data:data, color:t<0.5?C.muted:C.green, width:2, fill:true, dot:true}],
-             {min:-0.04, max:1.06, ticks:ticks, fmt:fmt});
+  drawSeries(morphC, [{data:data, color:t<0.5?C.muted:C.green, width:2, fill:true, dot:!hover}],
+             {min:-0.04, max:1.06, ticks:ticks, fmt:fmt, hover:hover});
 }
 function morphTo(target){
   morphTarget=target;
@@ -594,6 +666,14 @@ var io2=new IntersectionObserver(function(es){
 },{threshold:.3});
 io2.observe(document.querySelector('.chart-card'));
 morphDraw();
+
+/* chart hover */
+wireHover(document.getElementById('heroChart'), twr.length, function(i){
+  if(i===heroHoverI) return; heroHoverI=i; if(fired||RM) heroDraw();
+});
+wireHover(document.getElementById('morphChart'), twr.length, function(i){
+  if(i===morphHoverI) return; morphHoverI=i; morphDraw();
+});
 
 /* redraw on resize */
 var rt;
