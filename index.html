@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sharpe — Portfolio Analytics for DEGIRO</title>
+<meta name="description" content="A browser extension that adds true time-weighted returns, allocation analytics, dividend tracking and risk analysis to your DEGIRO account. Every calculation runs locally in your browser.">
+<link rel="icon" href="assets/favicon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Sharpe — Portfolio Analytics for DEGIRO">
+<meta property="og:description" content="True time-weighted returns, allocation analytics and risk metrics for your DEGIRO portfolio. Calculated locally, never uploaded.">
+<meta property="og:image" content="assets/portfolio.webp">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  @font-face{font-family:'Syne';font-weight:400;font-display:swap;src:url('assets/fonts/syne-latin-400-normal.woff2') format('woff2')}
+  @font-face{font-family:'Syne';font-weight:700;font-display:swap;src:url('assets/fonts/syne-latin-700-normal.woff2') format('woff2')}
+  @font-face{font-family:'Syne';font-weight:800;font-display:swap;src:url('assets/fonts/syne-latin-800-normal.woff2') format('woff2')}
+  @font-face{font-family:'JetBrains Mono';font-weight:400;font-display:swap;src:url('assets/fonts/jetbrains-mono-latin-400-normal.woff2') format('woff2')}
+  @font-face{font-family:'JetBrains Mono';font-weight:500;font-display:swap;src:url('assets/fonts/jetbrains-mono-latin-500-normal.woff2') format('woff2')}
+
+  :root{
+    --bg:#080D13; --bg2:#111820; --bg3:#1A2230; --border:#232E3C;
+    --text:#E8ECF1; --muted:#7A8BA0; --dim:#2E3B4A;
+    --accent:#4EA8DE; --green:#34D399; --red:#F87171; --gold:#FFD700;
+    --fd:'Syne',system-ui,sans-serif; --fm:'JetBrains Mono',ui-monospace,Menlo,monospace;
+    --r:10px; --maxw:1120px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:var(--fm);font-size:15px;line-height:1.65;
+       -webkit-font-smoothing:antialiased}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:2px;background:var(--accent);opacity:.7;z-index:100}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  h1,h2,h3{font-family:var(--fd);letter-spacing:-.02em;text-wrap:balance;line-height:1.15}
+  section{padding:88px 0;border-top:1px solid var(--border)}
+  .eyebrow{font-family:var(--fm);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+
+  /* ── nav ─────────────────────────────────────────── */
+  nav{position:sticky;top:2px;z-index:50;background:rgba(8,13,19,.88);backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--border)}
+  nav .wrap{display:flex;align-items:center;gap:14px;padding-top:14px;padding-bottom:14px}
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--fd);font-weight:800;font-size:21px;letter-spacing:-.02em;color:var(--text)}
+  .brand img{width:28px;height:28px}
+  .nav-links{display:flex;gap:22px;margin-left:auto;font-size:13px}
+  .nav-links a{color:var(--muted)}
+  .nav-links a:hover{color:var(--text);text-decoration:none}
+  @media(max-width:720px){.nav-links{display:none}}
+
+  /* ── buttons ─────────────────────────────────────── */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--fm);
+       font-size:13px;padding:11px 20px;border-radius:8px;border:1px solid var(--border);
+       color:var(--muted);background:none;cursor:pointer;transition:border-color .15s,color .15s,background .15s;white-space:nowrap}
+  .btn:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
+  .btn--primary{background:var(--accent);border-color:var(--accent);color:#061018;font-family:var(--fd);font-weight:700;font-size:14px}
+  .btn--primary:hover{filter:brightness(1.12);color:#061018;text-decoration:none}
+
+  /* ── hero ────────────────────────────────────────── */
+  header.hero{padding:96px 0 0;text-align:center;border:0}
+  h1{font-size:clamp(34px,5.6vw,60px);font-weight:800}
+  h1 .accent{color:var(--accent)}
+  .hero p.lede{font-size:16px;line-height:1.75;color:var(--muted);max-width:78ch;margin:22px auto 0}
+  .hero .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:32px}
+  .trust{display:flex;gap:8px 22px;justify-content:center;flex-wrap:wrap;margin-top:26px;
+         font-family:var(--fm);font-size:11.5px;color:var(--muted)}
+  .trust span::before{content:'✓ ';color:var(--green)}
+
+  .shot{margin-top:56px;border:1px solid var(--border);border-radius:12px;overflow:hidden;
+        background:var(--bg2);box-shadow:0 30px 80px rgba(0,0,0,.55)}
+  .shot img{display:block;width:100%;height:auto}
+  .shot-note{font-family:var(--fm);font-size:11px;color:var(--dim);text-align:center;margin-top:12px}
+
+  /* ── the problem ─────────────────────────────────── */
+  h2{font-size:clamp(24px,3.2vw,34px);font-weight:700;margin-top:10px}
+  .sub{color:var(--muted);max-width:66ch;margin-top:16px;font-size:15.5px}
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:38px}
+  @media(max-width:760px){.compare{grid-template-columns:1fr}}
+  .panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:22px 24px}
+  .panel .eyebrow{display:block;margin-bottom:14px}
+  .panel .big{font-family:var(--fd);font-size:34px;font-weight:800;letter-spacing:-.02em}
+  .panel .cap{font-size:13px;color:var(--muted);margin-top:8px}
+  .panel--bad{border-color:color-mix(in srgb,var(--red) 40%,transparent)}
+  .panel--bad .big{color:var(--red)}
+  .panel--good{border-color:color-mix(in srgb,var(--green) 40%,transparent)}
+  .panel--good .big{color:var(--green)}
+
+  /* ── features ────────────────────────────────────── */
+  .feat{display:grid;grid-template-columns:0.92fr 1.08fr;gap:52px;align-items:center;margin-top:64px}
+  .feat:first-of-type{margin-top:44px}
+  .feat--flip .feat-text{order:2}
+  @media(max-width:860px){.feat{grid-template-columns:1fr;gap:28px}.feat--flip .feat-text{order:0}}
+  .feat h3{font-size:21px;font-weight:700;margin:10px 0 12px}
+  .feat ul{list-style:none;margin-top:16px;display:flex;flex-direction:column;gap:10px}
+  .feat li{font-size:14px;color:var(--muted);padding-left:20px;position:relative}
+  .feat li::before{content:'';position:absolute;left:0;top:9px;width:7px;height:7px;border-radius:50%;
+                   background:var(--accent);opacity:.75}
+  .feat li b{color:var(--text);font-weight:500}
+  .feat-shot{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--bg2);
+             box-shadow:0 18px 46px rgba(0,0,0,.45)}
+  .feat-shot img{display:block;width:100%;height:auto}
+
+  /* ── privacy spec ────────────────────────────────── */
+  .spec{margin-top:36px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+  .spec-row{display:grid;grid-template-columns:210px 1fr;gap:24px;padding:18px 24px;border-bottom:1px solid var(--border)}
+  .spec-row:last-child{border-bottom:0}
+  .spec-row:nth-child(odd){background:var(--bg2)}
+  @media(max-width:700px){.spec-row{grid-template-columns:1fr;gap:6px}}
+  .spec-k{font-family:var(--fm);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  .spec-v{font-size:14px}
+  .spec-v code{font-family:var(--fm);font-size:.9em;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--text)}
+
+  /* ── tiers ───────────────────────────────────────── */
+  .tiers{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:38px}
+  @media(max-width:760px){.tiers{grid-template-columns:1fr}}
+  .tier{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:26px}
+  .tier--pro{border-color:color-mix(in srgb,var(--gold) 40%,transparent)}
+  .tier h3{font-size:17px;font-weight:700}
+  .tag{display:inline-block;font-family:var(--fd);font-weight:700;font-size:10px;letter-spacing:.08em;
+       padding:2px 7px;border-radius:4px;border:1px solid color-mix(in srgb,var(--gold) 45%,transparent);
+       color:var(--gold);background:color-mix(in srgb,var(--gold) 12%,transparent);vertical-align:2px;margin-left:8px}
+  .tier ul{list-style:none;margin-top:16px;display:flex;flex-direction:column;gap:9px}
+  .tier li{font-size:13.5px;color:var(--muted);padding-left:18px;position:relative}
+  .tier li::before{content:'·';position:absolute;left:4px;color:var(--dim)}
+
+  /* ── install ─────────────────────────────────────── */
+  .steps{counter-reset:s;list-style:none;margin-top:32px;display:flex;flex-direction:column;gap:16px}
+  .steps li{counter-increment:s;position:relative;padding-left:46px;font-size:15px;color:var(--muted)}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:-1px;width:30px;height:30px;
+    border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;
+    font-family:var(--fm);font-size:12px;color:var(--accent)}
+  .steps li b{color:var(--text);font-weight:500}
+
+  /* ── footer ──────────────────────────────────────── */
+  footer{border-top:1px solid var(--border);padding:44px 0 64px}
+  .foot-top{display:flex;gap:20px;flex-wrap:wrap;align-items:center}
+  .foot-links{display:flex;gap:20px;margin-left:auto;flex-wrap:wrap;font-size:13px}
+  .disclaimer{margin-top:26px;font-size:12px;color:var(--dim);line-height:1.7;max-width:88ch}
+
+  /* ── small screens: the hero was 13 lines of centred mono before the CTA ── */
+  @media(max-width:560px){
+    header.hero{padding-top:52px;text-align:left}
+    h1{font-size:29px}
+    .hero p.lede{font-size:14px;line-height:1.7;margin:18px 0 0;max-width:none}
+    .hero .cta{justify-content:stretch;flex-direction:column;margin-top:26px}
+    .hero .cta .btn{width:100%}
+    .trust{justify-content:flex-start;gap:6px 16px;font-size:11px}
+    .shot{margin-top:36px}
+    section{padding:60px 0}
+    .feat{margin-top:44px}
+    .spec-row{padding:16px 18px}
+    .tier,.panel{padding:20px}
+    .wrap{padding:0 18px}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="assets/logo.png" alt="">Sharpe</a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#privacy">Privacy</a>
+      <a href="#pricing">Free &amp; PRO</a>
+      <a href="#install">Install</a>
+      <a href="https://github.com/vapeur02/sharpe-degiro-analytics">Source</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="eyebrow">Browser extension for DEGIRO</div>
+    <h1>Find out what your portfolio<br><span class="accent">actually</span> returned.</h1>
+    <p class="lede">If you invest monthly, DEGIRO's "Total P&amp;L" is distorted by every deposit you make —
+      it cannot tell you whether your decisions were any good. Sharpe adds true time-weighted returns,
+      allocation analytics, dividend tracking and risk metrics to the account you already have.
+      Every figure is calculated in your browser and never leaves your machine.</p>
+    <div class="cta">
+      <a class="btn btn--primary" href="https://chromewebstore.google.com/detail/sharpe-portfolio-analytic/jfkggpahncfpbeeiiadiblbifjnbdlfp">Add to Chrome — free</a>
+      <a class="btn" href="https://github.com/vapeur02/sharpe-degiro-analytics">Read the source</a>
+    </div>
+    <div class="trust">
+      <span>Runs entirely on your machine</span>
+      <span>Read-only access</span>
+      <span>No accounts, no tracking</span>
+      <span>Source is public</span>
+    </div>
+    <div class="shot"><img src="assets/portfolio.webp" width="2880" height="1760" alt="The Sharpe dashboard: a time-weighted return chart benchmarked against the S&amp;P 500, allocation breakdown, and a positions table with weight bars and 30-day sparklines."></div>
+    <p class="shot-note">Screenshots show a demo portfolio, not real holdings.</p>
+  </div>
+</header>
+
+<section id="why">
+  <div class="wrap">
+    <div class="eyebrow">The problem</div>
+    <h2>Deposits inflate your P&amp;L. Returns don't lie.</h2>
+    <p class="sub">Put €500 in every month and your Total P&amp;L climbs even when every one of your picks is
+      flat, because the number counts your own cash as gains. Time-weighted return removes the cash flows and
+      measures only what your investing decisions did — the same method funds are required to report.</p>
+    <div class="compare">
+      <div class="panel panel--bad">
+        <span class="eyebrow">What DEGIRO shows you</span>
+        <div class="big">+21 448 €</div>
+        <p class="cap">Total P&amp;L. Rises when you deposit, falls when you withdraw, and mixes both with
+          actual performance. Useless for judging your own decisions.</p>
+      </div>
+      <div class="panel panel--good">
+        <span class="eyebrow">What Sharpe shows you</span>
+        <div class="big">+41.1%</div>
+        <p class="cap">Time-weighted return since inception, with the deposits stripped out — plus annualised
+          return, max drawdown, beta, alpha and Sharpe ratio for whatever window you're looking at.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <div class="eyebrow">What you get</div>
+    <h2>Six tabs of analysis DEGIRO doesn't give you.</h2>
+
+    <div class="feat">
+      <div class="feat-text">
+        <div class="eyebrow">Portfolio</div>
+        <h3>One chart, the whole story</h3>
+        <ul>
+          <li><b>Cumulative or daily.</b> The full curve since inception, or a bar per trading day to see which days made your year.</li>
+          <li><b>Benchmark overlays.</b> S&amp;P 500, Euro Stoxx 50 and Nasdaq 100, anchored to the day your portfolio actually started.</li>
+          <li><b>Trade markers</b> so you can see how each buy and sell landed, and drag anywhere to zoom.</li>
+          <li><b>Positions that explain themselves:</b> weight bars, a 30-day sparkline per holding, and click-to-expand detail with average cost, volatility and a full price chart.</li>
+        </ul>
+      </div>
+      <div class="feat-shot"><img src="assets/daily.webp" width="2880" height="1760" loading="lazy" alt="The performance card in Daily mode: green and red bars for each trading day with S&amp;P 500 comparison markers."></div>
+    </div>
+
+    <div class="feat feat--flip">
+      <div class="feat-text">
+        <div class="eyebrow">Insights</div>
+        <h3>Whether your diversification is real</h3>
+        <ul>
+          <li><b>Portfolio Pulse.</b> Plain-language observations from your own figures — concentration, risk-adjusted trend, drawdown against your high-water mark.</li>
+          <li><b>Correlation matrix</b> across every holding, with weighted average correlation and a principal-component breakdown. Six ETFs that all track the same index is not diversification.</li>
+          <li><b>Risk analysis.</b> Daily Value at Risk at 90/95/99% confidence, plus stress tests against real historical crashes with per-position impact.</li>
+          <li><b>Rate My Portfolio.</b> Five questions about your horizon and goals, then a grade against <em>your</em> objectives rather than a generic template.</li>
+        </ul>
+      </div>
+      <div class="feat-shot"><img src="assets/insights.webp" width="2880" height="1760" loading="lazy" alt="The Insights tab: dividend, currency, realized-gain and fee figures with an auto-generated concentration observation."></div>
+    </div>
+
+    <div class="feat">
+      <div class="feat-text">
+        <div class="eyebrow">Today</div>
+        <h3>What moved, and what it cost you</h3>
+        <ul>
+          <li><b>Per-position daily change</b> in % and €, with each holding's contribution to the day's return.</li>
+          <li><b>Three views of the same day:</b> a table, a contribution waterfall, or a heatmap sized by weight and coloured by move.</li>
+          <li><b>Replay any past day</b> — the whole tab rebuilt from your transaction history as it stood that morning.</li>
+          <li><b>Daily stats:</b> winning streak, best and worst day of the month, average daily return and win rate.</li>
+        </ul>
+      </div>
+      <div class="feat-shot"><img src="assets/today.webp" width="2880" height="1760" loading="lazy" alt="The Today tab: daily statistics and a movers table showing per-position daily change, weight and contribution."></div>
+    </div>
+
+    <div class="feat feat--flip">
+      <div class="feat-text">
+        <div class="eyebrow">Dividends &amp; Tax</div>
+        <h3>Income you'd otherwise have to total by hand</h3>
+        <ul>
+          <li><b>Every payment DEGIRO ever credited you</b>, totalled all-time and over the trailing 12 months, with a monthly chart and your yield on cost.</li>
+          <li><b>Expected next payments,</b> read from the cadence of your own history — labelled as an estimate, because issuers announce dividends, not extensions.</li>
+          <li><b>Realized P&amp;L</b> from closed positions on FIFO cost basis, and the currency effect on your non-EUR holdings.</li>
+          <li><b>Tax tables</b> for the Netherlands, France, Germany and Belgium, built from your own history and exportable as a PDF.</li>
+        </ul>
+      </div>
+      <div class="feat-shot"><img src="assets/dividends.webp" width="2880" height="1760" loading="lazy" alt="The Dividends tab: income received over 12 months and all-time, yield on cost, a monthly chart and estimated next payments."></div>
+    </div>
+  </div>
+</section>
+
+<section id="privacy">
+  <div class="wrap">
+    <div class="eyebrow">Privacy &amp; security</div>
+    <h2>You should be paranoid about this. So am I.</h2>
+    <p class="sub">An extension that reads your brokerage account deserves scrutiny. Here is exactly what
+      Sharpe does and doesn't do — and because the source is public, you don't have to take my word for it.</p>
+    <div class="spec">
+      <div class="spec-row"><div class="spec-k">Where it runs</div><div class="spec-v">Entirely in your browser. There is no backend, no database and no account to create. Your portfolio data is never transmitted anywhere.</div></div>
+      <div class="spec-row"><div class="spec-k">Account access</div><div class="spec-v">Read-only. Sharpe issues <code>GET</code> requests to DEGIRO's own reporting endpoints — the same ones the website calls. It cannot place, modify or cancel an order.</div></div>
+      <div class="spec-row"><div class="spec-k">Credentials</div><div class="spec-v">Never seen or stored. Sharpe uses the session you already have open; it never asks for your DEGIRO login.</div></div>
+      <div class="spec-row"><div class="spec-k">Dependencies</div><div class="spec-v">Vanilla JavaScript. No npm packages, no frameworks, no minified third-party bundles — nothing that could turn into a supply-chain problem.</div></div>
+      <div class="spec-row"><div class="spec-k">Architecture</div><div class="spec-v">Manifest V3, which means the browser itself forbids remote code execution. The extension cannot download and run new code after you install it.</div></div>
+      <div class="spec-row"><div class="spec-k">Data at rest</div><div class="spec-v">Cached locally so the dashboard opens instantly, and cleared automatically after 24 hours.</div></div>
+      <div class="spec-row"><div class="spec-k">Verify it yourself</div><div class="spec-v">Every file in the <a href="https://github.com/vapeur02/sharpe-degiro-analytics">public repository</a> is exactly what ships to the Chrome Web Store. Clone it, read it, load it unpacked.</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="wrap">
+    <div class="eyebrow">Free &amp; PRO</div>
+    <h2>The core is free. Always.</h2>
+    <p class="sub">Everything you need to answer "how am I actually doing" costs nothing. PRO unlocks the
+      heavier analysis and funds keeping the extension working when DEGIRO changes their platform.</p>
+    <div class="tiers">
+      <div class="tier">
+        <h3>Free</h3>
+        <ul>
+          <li>True time-weighted return chart, all periods</li>
+          <li>Annualised return, max drawdown, beta, alpha, Sharpe ratio</li>
+          <li>Benchmark overlays and trade markers</li>
+          <li>Allocation by holding, geography, asset class and currency</li>
+          <li>Positions table with weight bars and sparklines</li>
+          <li>Closed-position and fee tracking, currency effect</li>
+          <li>Dividend income totals and monthly chart</li>
+          <li>Daily statistics and Portfolio Pulse</li>
+        </ul>
+      </div>
+      <div class="tier tier--pro">
+        <h3>Sharpe<span class="tag">PRO</span></h3>
+        <ul>
+          <li>Today's Movers, with waterfall and heatmap views</li>
+          <li>Watchlist tracking with correlation and trend signals</li>
+          <li>Per-position price charts with your trades marked</li>
+          <li>Correlation matrix, weighted average correlation, PCA</li>
+          <li>Value at Risk and scenario stress tests</li>
+          <li>Full Rate My Portfolio analysis</li>
+          <li>Per-holding dividend breakdown</li>
+          <li>Tax tables for NL, FR, DE and BE</li>
+          <li>CSV export across every table and chart</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="install">
+  <div class="wrap">
+    <div class="eyebrow">Install</div>
+    <h2>Two minutes, no signup.</h2>
+    <ol class="steps">
+      <li><b>Install from the Chrome Web Store</b> — <a href="https://chromewebstore.google.com/detail/sharpe-portfolio-analytic/jfkggpahncfpbeeiiadiblbifjnbdlfp">Sharpe: Portfolio Analytics for DEGIRO</a>.</li>
+      <li><b>Pin it</b> to your toolbar so it's one click away.</li>
+      <li><b>Log in to DEGIRO</b> as you normally would, at <code>trader.degiro.nl</code> or your local domain.</li>
+      <li><b>Open the extension.</b> The first sync takes 20–30 seconds while it fetches your price history; after that the dashboard opens instantly.</li>
+    </ol>
+    <p class="sub" style="margin-top:30px">Prefer to run it from source? Clone the
+      <a href="https://github.com/vapeur02/sharpe-degiro-analytics">repository</a>, open
+      <code>chrome://extensions</code>, enable Developer mode and choose <b>Load unpacked</b>.
+      Firefox support is planned.</p>
+    <div class="cta" style="justify-content:flex-start;margin-top:36px">
+      <a class="btn btn--primary" href="https://chromewebstore.google.com/detail/sharpe-portfolio-analytic/jfkggpahncfpbeeiiadiblbifjnbdlfp">Add to Chrome — free</a>
+      <a class="btn" href="https://ko-fi.com/sharpe_dev">Support the project</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <a class="brand" href="#top"><img src="assets/logo.png" alt="">Sharpe</a>
+      <div class="foot-links">
+        <a href="https://chromewebstore.google.com/detail/sharpe-portfolio-analytic/jfkggpahncfpbeeiiadiblbifjnbdlfp">Chrome Web Store</a>
+        <a href="https://github.com/vapeur02/sharpe-degiro-analytics">Source</a>
+        <a href="https://github.com/vapeur02/sharpe-degiro-analytics/issues">Report a bug</a>
+        <a href="https://ko-fi.com/sharpe_dev">Ko-fi</a>
+      </div>
+    </div>
+    <p class="disclaimer">Sharpe is a community-built tool and is not affiliated with, endorsed by, or
+      connected to DEGIRO or flatexDEGIRO Bank AG. All metrics are calculated locally for informational
+      purposes only and do not constitute financial advice. Tax tables are informational and are not a
+      substitute for professional advice — check them against your own records before filing. Screenshots
+      on this page show a demo portfolio.</p>
+  </div>
+</footer>
+
+</body>
+</html>
