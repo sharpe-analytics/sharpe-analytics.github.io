@@ -126,13 +126,20 @@ ol li::before{content:counter(s);position:absolute;left:0;top:1px;width:21px;hei
     if (why) document.getElementById('manualWhy').textContent = why;
   }
 
-  // The key arrives in the URL fragment, never a query string: fragments are
-  // not sent to the server, so the licence never reaches GitHub's logs or a
-  // Referer header.
-  var key = '';
+  // The key can arrive in the fragment or the query string, because Lemon
+  // Squeezy's "Button link" validator rejects a placeholder inside a fragment.
+  // Fragment is preferred — fragments are never sent to the server, so the
+  // licence stays out of GitHub's request logs — and a query-string key is
+  // rewritten into fragment form immediately below, so at least a reload or a
+  // retry does not send it again.
+  var key = '', fromQuery = false;
   try {
     var h = new URLSearchParams((location.hash || '').replace(/^#/, ''));
     key = (h.get('key') || '').trim();
+    if (!key) {
+      key = (new URLSearchParams(location.search).get('key') || '').trim();
+      fromQuery = !!key;
+    }
   } catch (e) { key = ''; }
 
   // Lemon Squeezy leaves the placeholder verbatim if licensing is off for the
@@ -141,6 +148,13 @@ ol li::before{content:counter(s);position:absolute;left:0;top:1px;width:21px;hei
   if (!KEY_RE.test(key)) { show('stateNoKey'); return; }
 
   document.getElementById('keyText').textContent = key;
+
+  // Get the key out of the query string straight away: this keeps it out of
+  // the address bar, and means a reload retries via the fragment instead of
+  // sending the licence to the server a second time.
+  if (fromQuery) {
+    try { history.replaceState(null, '', location.pathname + '#key=' + encodeURIComponent(key)); } catch (e) {}
+  }
 
   var copyBtn = document.getElementById('copyBtn');
   copyBtn.addEventListener('click', function () {
