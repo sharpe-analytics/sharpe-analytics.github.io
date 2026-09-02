@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Activate Sharpe PRO</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="assets/favicon.png">
+<style>
+@font-face{font-family:'Syne';font-weight:800;font-display:swap;src:url('assets/fonts/syne-latin-800-normal.woff2') format('woff2')}
+@font-face{font-family:'Geist';font-weight:400;font-display:swap;src:url('assets/fonts/geist-latin-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Geist';font-weight:700;font-display:swap;src:url('assets/fonts/geist-latin-700-normal.woff2') format('woff2')}
+@font-face{font-family:'Geist';font-weight:800;font-display:swap;src:url('assets/fonts/geist-latin-800-normal.woff2') format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-weight:400;font-display:swap;src:url('assets/fonts/jetbrains-mono-latin-400-normal.woff2') format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-weight:500;font-display:swap;src:url('assets/fonts/jetbrains-mono-latin-500-normal.woff2') format('woff2')}
+
+:root{
+  --bg:#080D13; --bg2:#0D141D; --bg3:#141D29; --border:#1D2735; --border2:#283548;
+  --text:#E8ECF1; --muted:#8494A9; --dim:#6E8098;
+  --accent:#4EA8DE; --green:#34D399; --gold:#FFD700;
+  --fd:'Geist',system-ui,sans-serif; --fm:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--fd);font-size:16px;line-height:1.6;
+     -webkit-font-smoothing:antialiased;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px 20px}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.card{width:100%;max-width:520px;background:linear-gradient(180deg,var(--bg2),color-mix(in srgb,var(--bg2) 55%,var(--bg)));
+  border:1px solid var(--border);border-radius:16px;padding:34px 32px;box-shadow:0 40px 100px rgba(0,0,0,.5)}
+.brand{display:flex;align-items:center;gap:10px;font-family:'Syne',system-ui,sans-serif;font-weight:800;
+  font-size:21px;letter-spacing:-.02em;color:var(--text)}
+.brand img{width:24px;height:24px}
+.tag{display:inline-block;font-family:var(--fd);font-weight:800;font-size:10px;letter-spacing:.1em;
+  padding:2px 8px;border-radius:5px;border:1.5px solid color-mix(in srgb,var(--gold) 50%,transparent);
+  color:var(--gold);margin-left:4px;vertical-align:3px}
+h1{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.15;margin-top:26px;text-wrap:balance}
+p{color:var(--muted);font-size:15px;margin-top:12px}
+.spinner{width:17px;height:17px;border:2px solid var(--border2);border-top-color:var(--accent);
+  border-radius:50%;display:inline-block;vertical-align:-3px;margin-right:10px;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.spinner{animation-duration:2.4s}}
+.dot{color:var(--green);font-size:20px;vertical-align:-1px;margin-right:8px}
+.keybox{margin-top:20px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.keybox .lbl{font-family:var(--fm);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.keyrow{display:flex;align-items:center;gap:12px;margin-top:8px}
+#keyText{font-family:var(--fm);font-size:13.5px;font-weight:500;color:var(--text);word-break:break-all;flex:1;
+  -webkit-user-select:all;user-select:all}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--fm);font-size:12.5px;
+  padding:9px 16px;border-radius:8px;border:1px solid var(--border2);color:var(--muted);background:none;
+  cursor:pointer;white-space:nowrap;transition:border-color .18s,color .18s,transform .18s}
+.btn:hover{border-color:var(--accent);color:var(--text);transform:translateY(-1px)}
+.btn--primary{background:var(--accent);border-color:var(--accent);color:#04101B;font-family:var(--fd);font-weight:700;font-size:14px}
+.btn--primary:hover{color:#04101B}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+ol{margin-top:16px;padding-left:0;list-style:none;counter-reset:s}
+ol li{counter-increment:s;position:relative;padding-left:32px;color:var(--muted);font-size:14.5px;margin-top:10px}
+ol li::before{content:counter(s);position:absolute;left:0;top:1px;width:21px;height:21px;border:1px solid var(--border2);
+  border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:10.5px;color:var(--accent)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+.foot{margin-top:26px;padding-top:18px;border-top:1px solid var(--border);font-size:13px;color:var(--dim)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="card">
+  <span class="brand"><img src="assets/logo.png" alt="">Sharpe<span class="tag">PRO</span></span>
+
+  <!-- working -->
+  <div id="stateBusy">
+    <h1><span class="spinner"></span>Activating…</h1>
+    <p>Handing your licence to the extension. This takes a second.</p>
+  </div>
+
+  <!-- activated automatically -->
+  <div id="stateDone" hidden>
+    <h1><span class="dot">&#9679;</span>PRO is active</h1>
+    <p id="doneText">Everything is unlocked. Open Sharpe and your correlation matrix, risk analysis, tax tables and CSV exports are all there.</p>
+    <div class="actions">
+      <a class="btn btn--primary" href="https://trader.degiro.nl/trader/#/portfolio">Open DEGIRO</a>
+      <a class="btn" href="/">Back to Sharpe</a>
+    </div>
+    <div class="foot">Thank you for buying PRO — it funds keeping Sharpe working when DEGIRO changes their platform.</div>
+  </div>
+
+  <!-- couldn't reach the extension: manual paste -->
+  <div id="stateManual" hidden>
+    <h1>Your licence key</h1>
+    <p id="manualWhy">Sharpe couldn&rsquo;t be reached from this page, so activate it by hand — it takes a moment.</p>
+    <div class="keybox">
+      <span class="lbl">Licence key</span>
+      <div class="keyrow">
+        <span id="keyText"></span>
+        <button class="btn" id="copyBtn" type="button">Copy</button>
+      </div>
+    </div>
+    <ol>
+      <li>Open the Sharpe extension.</li>
+      <li>Click the <strong style="color:var(--text);font-weight:700">PRO</strong> button in the header.</li>
+      <li>Choose <strong style="color:var(--text);font-weight:700">I have a license key</strong>, paste, and activate.</li>
+    </ol>
+    <div class="foot">This key is also in your receipt email, so you can come back to it any time.</div>
+  </div>
+
+  <!-- opened with no key at all -->
+  <div id="stateNoKey" hidden>
+    <h1>Nothing to activate</h1>
+    <p>This page activates Sharpe PRO right after a purchase. There&rsquo;s no licence key in this link — if you&rsquo;ve already bought PRO, the key is in your receipt email.</p>
+    <div class="actions">
+      <a class="btn btn--primary" href="/#pricing">See PRO</a>
+      <a class="btn" href="/">Back to Sharpe</a>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+(function () {
+  var EXT_ID = 'jfkggpahncfpbeeiiadiblbifjnbdlfp';
+  var KEY_RE = /^[A-Za-z0-9-]{8,64}$/;
+
+  function show(id, why) {
+    ['stateBusy', 'stateDone', 'stateManual', 'stateNoKey'].forEach(function (s) {
+      document.getElementById(s).hidden = (s !== id);
+    });
+    if (why) document.getElementById('manualWhy').textContent = why;
+  }
+
+  // The key arrives in the URL fragment, never a query string: fragments are
+  // not sent to the server, so the licence never reaches GitHub's logs or a
+  // Referer header.
+  var key = '';
+  try {
+    var h = new URLSearchParams((location.hash || '').replace(/^#/, ''));
+    key = (h.get('key') || '').trim();
+  } catch (e) { key = ''; }
+
+  // Lemon Squeezy leaves the placeholder verbatim if licensing is off for the
+  // product — treat that as "no key" rather than trying to activate it.
+  if (!key || key === '[license_key]') { show('stateNoKey'); return; }
+  if (!KEY_RE.test(key)) { show('stateNoKey'); return; }
+
+  document.getElementById('keyText').textContent = key;
+
+  var copyBtn = document.getElementById('copyBtn');
+  copyBtn.addEventListener('click', function () {
+    var done = function () { copyBtn.textContent = 'Copied'; setTimeout(function(){ copyBtn.textContent = 'Copy'; }, 1600); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(key).then(done, function () { fallbackSelect(); });
+    } else { fallbackSelect(); }
+  });
+  function fallbackSelect() {
+    var r = document.createRange(); r.selectNodeContents(document.getElementById('keyText'));
+    var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    copyBtn.textContent = 'Press ⌘C';
+  }
+
+  var settled = false;
+  function settle(fn) { if (settled) return; settled = true; fn(); }
+
+  // Never leave the user on a spinner: if the extension does not answer,
+  // fall through to the manual instructions.
+  var timer = setTimeout(function () {
+    settle(function () { show('stateManual'); });
+  }, 8000);
+
+  try {
+    if (!window.chrome || !chrome.runtime || !chrome.runtime.sendMessage) {
+      throw new Error('no extension bridge');
+    }
+    chrome.runtime.sendMessage(EXT_ID, { type: 'SHARPE_ACTIVATE_LICENSE', key: key }, function (res) {
+      clearTimeout(timer);
+      var err = chrome.runtime.lastError; // set when Sharpe is missing or too old
+      settle(function () {
+        if (err || !res) { show('stateManual'); return; }
+        if (res.ok) {
+          // Consumed successfully — take the key out of the visible URL.
+          try { history.replaceState(null, '', location.pathname); } catch (e) {}
+          if (res.already) {
+            document.getElementById('doneText').textContent =
+              'This licence was already active on Sharpe here. Nothing else to do.';
+          }
+          show('stateDone');
+          return;
+        }
+        if (res.reason === 'rejected') {
+          show('stateManual', (res.message || 'Sharpe could not verify this licence.') +
+            ' You can try activating it by hand below.');
+        } else {
+          show('stateManual');
+        }
+      });
+    });
+  } catch (e) {
+    clearTimeout(timer);
+    settle(function () { show('stateManual'); });
+  }
+})();
+</script>
+</body>
+</html>
