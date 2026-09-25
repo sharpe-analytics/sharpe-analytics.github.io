@@ -5,8 +5,32 @@
  const now=Date.now(),day=864e5,today=new Date(now).toISOString().slice(0,10);
  const names=['iShares Core S&P 500 ETF','Vanguard FTSE All-World ETF','ASML Holding','Schneider Electric','iShares Physical Gold ETC','iShares Core Euro Govt Bond ETF'];
  const quantities=[40,130,12,30,95,35],bases=[490,109,625,190,47,109],prices={};
- names.forEach((name,j)=>{let value=bases[j]*.75;let seed=123+j*113;const rand=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};prices[String(j+1)]=Array.from({length:1827},(_,i)=>{value*=Math.exp(.00022+Math.sin(i*.055)*.001+(rand()-.5)*(.015+j*.0005));return{date:new Date(now-(1826-i)*day).toISOString().slice(0,10),price:Math.round(value*100)/100};});});
- ['__SP500__','__EUROSTOXX__','__NASDAQ__','__STOXX600__'].forEach((id,j)=>{let value=100;prices[id]=Array.from({length:1827},(_,i)=>{value*=Math.exp(.00021+j*.00001+Math.sin(i*.055)*.001+Math.sin(i*.83+j)*.003);return{date:new Date(now-(1826-i)*day).toISOString().slice(0,10),price:value};});});
+ // One shared, seeded market path keeps benchmarks and holdings related without
+ // repeating waves. Weekday observations include volatile sell-offs and recoveries.
+ let seed=424242;
+ const uniform=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return(seed+.5)/4294967296;};
+ const normal=()=>Math.sqrt(-2*Math.log(uniform()))*Math.cos(2*Math.PI*uniform());
+ const dates=Array.from({length:1827},(_,i)=>new Date(now-(1826-i)*day))
+   .filter(d=>d.getUTCDay()!==0&&d.getUTCDay()!==6).map(d=>d.toISOString().slice(0,10));
+ const ids=['1','2','3','4','5','6','__SP500__','__EUROSTOXX__','__NASDAQ__','__STOXX600__'];
+ const values=[...bases.map(v=>v*.75),100,100,100,100];
+ ids.forEach(id=>prices[id]=[]);
+ let volatility=.008;
+ dates.forEach((date,i)=>{
+   const phase=i/dates.length;
+   const stress=(phase>.22&&phase<.34)||(phase>.68&&phase<.73);
+   const innovation=normal();
+   volatility=.92*volatility+.08*(stress?.017:.007)+.0003*Math.abs(innovation);
+   const market=(stress?-.0014:.00065)+volatility*innovation;
+   const europe=.78*market+.0035*normal();
+   const tech=1.18*market+.005*normal();
+   const rates=.003*normal();
+   const returns=[market+.0005*normal(),.72*market+.28*europe+.001*normal(),
+     1.15*tech+.009*normal(),1.05*europe+.006*normal(),
+     .00022-.15*market+.008*normal(),.00006-.08*market+rates,
+     market,europe+.001*normal(),tech,europe];
+   ids.forEach((id,j)=>{values[j]*=Math.exp(returns[j]);prices[id].push({date,price:Math.round(values[j]*100)/100});});
+ });
  const start=prices['1'][0].date;
  const productInfo={data:Object.fromEntries(names.map((name,j)=>[String(j+1),{name,currency:'EUR',productTypeId:j===2||j===3?1:131,vwdId:'sample-'+j,vwdIdentifierType:'issueid',isin:['IE00B5BMR087','IE00B3RBWM25','NL0010273215','FR0000121972','IE00B4ND3602','IE00B4WXJJ64'][j]}]))};
  const tx=names.map((_,j)=>({date:start,productId:String(j+1),quantity:quantities[j],price:prices[String(j+1)][0].price,totalInBaseCurrency:-quantities[j]*prices[String(j+1)][0].price,totalFeesInBaseCurrency:2,buysell:'B'}));
