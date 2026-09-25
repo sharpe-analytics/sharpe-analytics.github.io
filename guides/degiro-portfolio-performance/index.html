@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to measure your DEGIRO portfolio performance | Sharpe</title><meta name="description" content="Separate investment returns from deposits, withdrawals and changes in portfolio value."><link rel="canonical" href="https://sharpe-analytics.github.io/guides/degiro-portfolio-performance/">
+<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/site.js" defer>
+
+</script>
+
+<meta property="og:type" content="article"><meta property="og:title" content="How to measure your DEGIRO portfolio performance | Sharpe"><meta property="og:description" content="Separate investment returns from deposits, withdrawals and changes in portfolio value."><meta property="og:url" content="https://sharpe-analytics.github.io/guides/degiro-portfolio-performance/"><meta property="og:image" content="https://sharpe-analytics.github.io/assets/og-performance.jpg"><meta property="og:image:alt" content="Sharpe portfolio analytics with a demo portfolio"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:image" content="https://sharpe-analytics.github.io/assets/og-performance.jpg"><meta name="twitter:card" content="summary_large_image">
+
+<script type="application/ld+json">
+[{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Sharpe", "item": "https://sharpe-analytics.github.io/"}, {"@type": "ListItem", "position": 2, "name": "How to measure your DEGIRO portfolio performance", "item": "https://sharpe-analytics.github.io/guides/degiro-portfolio-performance/"}]}]
+</script>
+
+</head>
+
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+
+<nav class="wrap navigation" aria-label="Main navigation">
+<a class="brand" href="/" aria-label="Sharpe home"><img src="/assets/logo.png" width="30" height="30" alt="">Sharpe</a>
+<div class="nav-links">
+<a href="/#features">Features</a><a href="/#pricing">Pricing</a><a href="/#guides">Guides</a><a href="/#privacy">Privacy</a>
+</div>
+<a class="button primary" href="https://chromewebstore.google.com/detail/sharpe-portfolio-analytic/jfkggpahncfpbeeiiadiblbifjnbdlfp?utm_source=sharpe_website&amp;utm_medium=website&amp;utm_campaign=degiro-portfolio-performance&amp;utm_content=navigation">Add to Chrome</a>
+</nav>
+
+</header>
+
+<main id="main">
+
+<article class="article wrap">
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+<a href="/">Sharpe</a><span aria-hidden="true">/</span><a href="/#guides">Guides</a>
+</nav>
+
+<header class="article-header">
+
+<p class="intro-label">
+A guide for DEGIRO investors
+</p>
+
+<h1>
+How to measure your DEGIRO portfolio performance
+</h1>
+
+<p class="reviewed">
+Reviewed <time datetime="2026-09-25">25 September 2026</time> by Sharpe
+</p>
+
+</header>
+
+<div class="article-body">
+
+<p class="article-answer">
+To measure your DEGIRO portfolio’s performance, separate changes in account value from deposits and withdrawals. Use monetary gains to understand how much you made, and time-weighted returns to compare investment performance over the same period.
+</p>
+
+<h2>
+Start with three different numbers
+</h2>
+
+<p>
+Portfolio value is a snapshot of what your holdings and included cash are worth. A deposit increases that value even if every investment price stays unchanged. A withdrawal reduces it without necessarily meaning you lost money.
+</p>
+
+<p>
+Monetary gain measures the investment result after accounting for external cash flows. For a period with consistent account coverage:
+</p>
+
+<div class="formula">
+Gain = ending value − starting value − deposits + withdrawals
+</div>
+
+<p>
+For example, starting with €10,000 and ending with €16,000 after depositing €5,000 gives a €1,000 gain. Include cash consistently at both ends. Whether dividends, fees and taxes are already reflected depends on the values and reports you use; do not count the same item twice.
+</p>
+
+<p>
+A percentage return answers a different question: how did the invested capital perform? Simply dividing that €1,000 gain by all the money you have ever deposited ignores when the money was invested.
+</p>
+
+<h2>
+A deposit is not an investment return
+</h2>
+
+<div class="table-scroll">
+
+<table>
+<caption>A deposit made after the period’s investment gain</caption>
+<thead>
+
+<tr>
+<th>Event</th><th>Portfolio value</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+<td>Start</td><td>€10,000</td>
+</tr>
+
+<tr>
+<td>Investments gain 10%</td><td>€11,000</td>
+</tr>
+
+<tr>
+<td>Add €5,000 at the end</td><td>€16,000</td>
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+<p>
+The value rose by 60%, but the investment return was 10%. The €5,000 deposit explains the rest. This example assumes no other cash flows, fees or taxes.
+</p>
+
+<h2>
+What time-weighted return measures
+</h2>
+
+<p>
+Time-weighted return divides the timeline around external cash flows and compounds the returns of the subperiods. That reduces the influence of the size and timing of your deposits on the performance figure.
+</p>
+
+<div class="formula">
+TWR = (1 + r₁) × (1 + r₂) × … − 1
+</div>
+
+<p>
+Two subperiods returning +10% and −5% produce a combined +4.5%, because 1.10 × 0.95 − 1 = 0.045. They do not produce +5%. Practical calculations depend on available valuations and cash-flow timing.
+</p>
+
+<p>
+A money-weighted return answers another useful question: what return did your own invested money earn, given the timing of your contributions? Neither measure replaces the other.
+</p>
+
+<h2>
+Read the correct DEGIRO figure
+</h2>
+
+<p>
+Do not confuse total account value with a position’s unrealised P&amp;L. DEGIRO describes unrealised position P&amp;L as a calculation based on break-even purchase prices, including currency movements but excluding items such as dividends and brokerage fees. That is not the same as a complete portfolio return.
+</p>
+
+<p>
+<a href="https://www.degiro.com/uk/helpdesk/trading-platform/using-trading-platform/what-break-even-price-my-portfolio-what-about-realised-and">Read DEGIRO’s explanation of break-even price and unrealised P&amp;L</a>.
+</p>
+
+<h2>
+Check your performance in Sharpe
+</h2>
+
+<ol>
+
+<li>
+Install Sharpe, sign in to DEGIRO and open the extension.
+</li>
+
+<li>
+Let the initial sync finish, then open the Portfolio tab.
+</li>
+
+<li>
+Choose your period and review the return chart, monetary values and risk metrics together.
+</li>
+
+<li>
+Add a benchmark to give that performance context.
+</li>
+
+</ol>
+
+<p>
+Core time-weighted returns and benchmark overlays are available in Sharpe Free. Data gaps and the selected period can affect interpretation; investigate unexpected figures against your account records.
+</p>
+
+<figure class="product-shot article-shot">
+<a class="screenshot-link" href="/assets/portfolio.webp" aria-label="Open full-size demo screenshot"><img src="/assets/portfolio.webp" srcset="/assets/portfolio-720.webp 720w, /assets/portfolio.webp 1440w" sizes="(min-width: 1200px) 1120px, 100vw" width="1440" height="900" alt="How to measure your DEGIRO portfolio performance illustrated with a demo portfolio in Sharpe" loading="lazy" decoding="async"></a>
+<figcaption>
+Sharpe’s Portfolio tab. Demo data shown.
+</figcaption>
+
+</figure>
+
+<aside class="article-install">
+
+<h2>
+Explore your own portfolio.
+</h2>
+
+<p>
+Use Sharpe with your existing DEGIRO session. Core portfolio analytics are free.
+</p>
+<a class="button primary" href="https://chromewebstore.google.com/detail/sharpe-portfolio-analytic/jfkggpahncfpbeeiiadiblbifjnbdlfp?utm_source=sharpe_website&amp;utm_medium=website&amp;utm_campaign=degiro-portfolio-performance&amp;utm_content=article">Add to Chrome — free</a>
+</aside>
+
+<p class="small">
+Educational information, not investment or tax advice. Past performance does not guarantee future results.
+</p>
+
+</div>
+
+</article>
+
+<section class="section surface">
+
+<div class="wrap">
+
+<h2>
+Keep exploring
+</h2>
+
+<div class="guide-list">
+<a class="guide-link" href="/guides/degiro-benchmark-comparison/">
+<h3>
+How to compare your DEGIRO portfolio with a benchmark
+</h3>
+
+<p>
+Put your returns in context with the S&P 500, STOXX Europe 600 and Nasdaq 100.
+</p>
+<span>Read the guide</span></a><a class="guide-link" href="/guides/degiro-dividend-tracking/">
+<h3>
+How to track dividends in your DEGIRO portfolio
+</h3>
+
+<p>
+Understand received income, yield on cost and estimated future payments.
+</p>
+<span>Read the guide</span></a>
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+<section class="final-cta">
+
+<div class="wrap">
+
+<h2>
+A clearer view of your investments.
+</h2>
+
+<p>
+Keep your broker. Get more from your portfolio.
+</p>
+<a class="button primary" href="https://chromewebstore.google.com/detail/sharpe-portfolio-analytic/jfkggpahncfpbeeiiadiblbifjnbdlfp?utm_source=sharpe_website&amp;utm_medium=website&amp;utm_campaign=degiro-portfolio-performance&amp;utm_content=footer">Add to Chrome — free</a>
+</div>
+
+</section>
+
+<footer class="site-footer wrap">
+
+<div class="footer-top">
+<a class="brand" href="/">Sharpe</a>
+<div>
+<a href="/#guides">Guides</a><a href="/#privacy">Privacy</a><a href="https://github.com/vapeur02/sharpe-degiro-analytics">Source code</a><a href="https://github.com/vapeur02/sharpe-degiro-analytics/issues">Support</a>
+</div>
+
+</div>
+
+<p>
+Independent software. Not affiliated with DEGIRO or flatexDEGIRO Bank AG. Analytics and simulations are for information, not investment advice. Tax summaries are not a substitute for professional advice. Product images show demo data.
+</p>
+
+</footer>
+
+</body>
+</html>
