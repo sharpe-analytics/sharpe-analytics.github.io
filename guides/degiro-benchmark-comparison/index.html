@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to compare your DEGIRO portfolio with a benchmark | Sharpe</title><meta name="description" content="Put your returns in context with the S&amp;P 500, STOXX Europe 600 and Nasdaq 100."><link rel="canonical" href="https://sharpe-analytics.github.io/guides/degiro-benchmark-comparison/">
+<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/site.js" defer>
+
+</script>
+
+<meta property="og:type" content="article"><meta property="og:title" content="How to compare your DEGIRO portfolio with a benchmark | Sharpe"><meta property="og:description" content="Put your returns in context with the S&amp;P 500, STOXX Europe 600 and Nasdaq 100."><meta property="og:url" content="https://sharpe-analytics.github.io/guides/degiro-benchmark-comparison/"><meta property="og:image" content="https://sharpe-analytics.github.io/assets/og-benchmark.jpg"><meta property="og:image:alt" content="Sharpe portfolio analytics with a demo portfolio"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:image" content="https://sharpe-analytics.github.io/assets/og-benchmark.jpg"><meta name="twitter:card" content="summary_large_image">
+
+<script type="application/ld+json">
+[{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Sharpe", "item": "https://sharpe-analytics.github.io/"}, {"@type": "ListItem", "position": 2, "name": "How to compare your DEGIRO portfolio with a benchmark", "item": "https://sharpe-analytics.github.io/guides/degiro-benchmark-comparison/"}]}]
+</script>
+
+</head>
+
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+
+<nav class="wrap navigation" aria-label="Main navigation">
+<a class="brand" href="/" aria-label="Sharpe home"><img src="/assets/logo.png" width="30" height="30" alt="">Sharpe</a>
+<div class="nav-links">
+<a href="/#features">Features</a><a href="/#pricing">Pricing</a><a href="/#guides">Guides</a><a href="/#privacy">Privacy</a>
+</div>
+<a class="button primary" href="https://chromewebstore.google.com/detail/sharpe-portfolio-analytic/jfkggpahncfpbeeiiadiblbifjnbdlfp?utm_source=sharpe_website&amp;utm_medium=website&amp;utm_campaign=degiro-benchmark-comparison&amp;utm_content=navigation">Add to Chrome</a>
+</nav>
+
+</header>
+
+<main id="main">
+
+<article class="article wrap">
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+<a href="/">Sharpe</a><span aria-hidden="true">/</span><a href="/#guides">Guides</a>
+</nav>
+
+<header class="article-header">
+
+<p class="intro-label">
+A guide for DEGIRO investors
+</p>
+
+<h1>
+How to compare your DEGIRO portfolio with a benchmark
+</h1>
+
+<p class="reviewed">
+Reviewed <time datetime="2026-09-25">25 September 2026</time> by Sharpe
+</p>
+
+</header>
+
+<div class="article-body">
+
+<p class="article-answer">
+Compare your DEGIRO portfolio and a relevant benchmark over the same dates, using percentage returns and a consistent baseline. Check currency and dividend treatment before interpreting a gap as better or worse performance.
+</p>
+
+<h2>
+Choose a benchmark that answers your question
+</h2>
+
+<p>
+A benchmark is a reference, not a target every portfolio should beat. A portfolio of bonds and European shares has different exposures from an index of large US companies.
+</p>
+
+<div class="table-scroll">
+
+<table>
+<caption>Benchmarks available as Sharpe portfolio overlays</caption>
+<thead>
+
+<tr>
+<th>Benchmark</th><th>What it helps you compare</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+<td>S&amp;P 500</td><td>Exposure to large US companies.</td>
+</tr>
+
+<tr>
+<td>STOXX Europe 600</td><td>A broader European equity reference spanning large, mid and small companies.</td>
+</tr>
+
+<tr>
+<td>Nasdaq 100</td><td>A reference for large non-financial companies listed on Nasdaq, with substantial technology exposure.</td>
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+<p>
+STOXX Europe 600 includes markets beyond the euro area. It is a different index from EURO STOXX 50. A portfolio holding a EURO STOXX 50 ETF may still legitimately show that holding’s name in the positions table.
+</p>
+
+<h2>
+Match the dates and the baseline
+</h2>
+
+<p>
+A return since 2022 cannot be compared directly with an index’s year-to-date return. Check the start and end dates, and whether the chart is displaying cumulative returns since inception or a return reset at the start of the selected window.
+</p>
+
+<p>
+For a cumulative series, the return between two displayed points is:
+</p>
+
+<div class="formula">
+Period return = (1 + ending cumulative return) ÷ (1 + starting cumulative return) − 1
+</div>
+
+<p>
+If a series moves from +20% to +32%, the return over that interval is 10%, not 12%: 1.32 ÷ 1.20 − 1 = 0.10.
+</p>
+
+<h2>
+Add benchmark overlays in Sharpe
+</h2>
+
+<ol>
+
+<li>
+Open the Portfolio tab and select the percentage performance view.
+</li>
+
+<li>
+Open Overlays and select S&amp;P 500, STOXX Europe 600 or Nasdaq 100.
+</li>
+
+<li>
+Choose a period and inspect the portfolio and benchmark over the same dates.
+</li>
+
+<li>
+Review the period return alongside risk measures such as drawdown. A higher return may come with larger losses along the way.
+</li>
+
+</ol>
+
+<p>
+Benchmark overlays are part of Sharpe Free. Missing provider history can limit what is displayed; a missing line is not a zero return.
+</p>
+
+<h2>
+Understand the comparison’s limits
+</h2>
+
+<ul>
+
+<li>
+<strong>Dividends:</strong> price indices and total-return indices are different. Sharpe uses provider price histories; do not assume that all series have the same dividend adjustment treatment.
+</li>
+
+<li>
+<strong>Currency:</strong> your account currency and an index’s quoted currency may differ. An overlay is not automatically a currency-hedged comparison.
+</li>
+
+<li>
+<strong>Cash flows:</strong> time-weighted portfolio performance differs from simulating the purchase of an index with each of your actual deposits.
+</li>
+
+<li>
+<strong>Costs and taxes:</strong> an index line is not an investable portfolio after your broker fees and personal taxes.
+</li>
+
+<li>
+<strong>Risk:</strong> a concentrated portfolio can outperform for a period while carrying risks a broad index does not.
+</li>
+
+</ul>
+
+<p>
+Use the chart as context rather than proof of investment skill or a prediction of future performance.
+</p>
+
+<h2>
+Read about the indices
+</h2>
+
+<p>
+Check the providers’ definitions: <a href="https://www.spglobal.com/spdji/en/indices/equity/sp-500/">S&amp;P 500</a>, <a href="https://stoxx.com/index/sxxp/">STOXX Europe 600</a> and <a href="https://indexes.nasdaq.com/Index/Overview/NDX">Nasdaq 100</a>.
+</p>
+
+<figure class="product-shot article-shot">
+<a class="screenshot-link" href="/assets/portfolio.webp" aria-label="Open full-size demo screenshot"><img src="/assets/portfolio.webp" srcset="/assets/portfolio-720.webp 720w, /assets/portfolio.webp 1440w" sizes="(min-width: 1200px) 1120px, 100vw" width="1440" height="900" alt="How to compare your DEGIRO portfolio with a benchmark illustrated with a demo portfolio in Sharpe" loading="lazy" decoding="async"></a>
+<figcaption>
+Sharpe’s Portfolio tab. Demo data shown.
+</figcaption>
+
+</figure>
+
+<aside class="article-install">
+
+<h2>
+Explore your own portfolio.
+</h2>
+
+<p>
+Use Sharpe with your existing DEGIRO session. Core portfolio analytics are free.
+</p>
+<a class="button primary" href="https://chromewebstore.google.com/detail/sharpe-portfolio-analytic/jfkggpahncfpbeeiiadiblbifjnbdlfp?utm_source=sharpe_website&amp;utm_medium=website&amp;utm_campaign=degiro-benchmark-comparison&amp;utm_content=article">Add to Chrome — free</a>
+</aside>
+
+<p class="small">
+Educational information, not investment or tax advice. Past performance does not guarantee future results.
+</p>
+
+</div>
+
+</article>
+
+<section class="section surface">
+
+<div class="wrap">
+
+<h2>
+Keep exploring
+</h2>
+
+<div class="guide-list">
+<a class="guide-link" href="/guides/degiro-portfolio-performance/">
+<h3>
+How to measure your DEGIRO portfolio performance
+</h3>
+
+<p>
+Separate investment returns from deposits, withdrawals and changes in portfolio value.
+</p>
+<span>Read the guide</span></a><a class="guide-link" href="/guides/degiro-dividend-tracking/">
+<h3>
+How to track dividends in your DEGIRO portfolio
+</h3>
+
+<p>
+Understand received income, yield on cost and estimated future payments.
+</p>
+<span>Read the guide</span></a>
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+<section class="final-cta">
+
+<div class="wrap">
+
+<h2>
+A clearer view of your investments.
+</h2>
+
+<p>
+Keep your broker. Get more from your portfolio.
+</p>
+<a class="button primary" href="https://chromewebstore.google.com/detail/sharpe-portfolio-analytic/jfkggpahncfpbeeiiadiblbifjnbdlfp?utm_source=sharpe_website&amp;utm_medium=website&amp;utm_campaign=degiro-benchmark-comparison&amp;utm_content=footer">Add to Chrome — free</a>
+</div>
+
+</section>
+
+<footer class="site-footer wrap">
+
+<div class="footer-top">
+<a class="brand" href="/">Sharpe</a>
+<div>
+<a href="/#guides">Guides</a><a href="/#privacy">Privacy</a><a href="https://github.com/vapeur02/sharpe-degiro-analytics">Source code</a><a href="https://github.com/vapeur02/sharpe-degiro-analytics/issues">Support</a>
+</div>
+
+</div>
+
+<p>
+Independent software. Not affiliated with DEGIRO or flatexDEGIRO Bank AG. Analytics and simulations are for information, not investment advice. Tax summaries are not a substitute for professional advice. Product images show demo data.
+</p>
+
+</footer>
+
+</body>
+</html>
