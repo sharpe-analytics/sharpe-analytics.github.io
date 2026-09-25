@@ -1,0 +1,2 @@
+/* Sizing/embedding only. Dashboard styling remains the extension's stylesheet. */
+html,body{margin:0;min-height:100%;overflow-x:hidden}.dashboard-footer,#reviewPrompt,#stalenessBanner,#portfolioWarning{display:none!important}.tab-btn[data-tab=watchlist],.tab-btn[data-tab=tax]{display:none}.header .logo:after{content:'Sample portfolio';font-size:10px;color:var(--muted);margin-left:10px;white-space:nowrap}#btnPro{pointer-events:none}.header{position:relative!important}.sample-message{padding:10px 24px;color:var(--muted);font-size:11px}.main{padding-bottom:24px}

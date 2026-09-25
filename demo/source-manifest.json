@@ -1,0 +1,18 @@
+{
+  "source": "Sharpe 1.7.4",
+  "note": "Extension rendering and simulation files copied verbatim. Only browser APIs and input data are replaced in the sample adapter.",
+  "files": {
+    "dashboard.js": "47d76830df3871a30453b03533ea4f0bfa3e24171d466aeed9394f6889c3250e",
+    "dashboard.css": "37f86c914fed5432c59272a62307643e6a3aeeaa10797340f3199acad5a621c2",
+    "chart.min.js": "fbc45926e6b46845a0f905552a0e0b1331049bff1115ecf94dbe0904d895e710",
+    "utils.js": "6a6ebc7e7dd8ab8cefd3a1c0c40d3da449b430e6addcef945a4f60355213ebe0",
+    "pro.js": "7870d6e28607a4d76785bac9a0e88adde6a1ebb5f1a3ba4659a3f46a30d0c168",
+    "theme-init.js": "9d601beb2889575852b508fe21f26a5ef3471e061f79001accd0295dbbf55f1f",
+    "today-live-model.js": "949e3c6c7e5761f927126f01c6eabce603e313d4d465727140de811baec5a455",
+    "today-live.js": "72c4771d19d516a3970a8c98dccfd27cfe4b3ae70068bf907f744e851e58369e",
+    "simulation-core.js": "e30e559f7543cd4acb90095173e7a99cb4d582a796e02a2e9612def355821e2c",
+    "simulation-worker.js": "7d590da4387f037bdfc1cbe549d4a08baf8f12791971f649c01f05e2c7dbb57b",
+    "simulation.js": "57a1bf80065f695b5ff6dcbdfeef44584501176411175baa195995590378649d"
+  },
+  "html_source_sha256": "31ea1a29fde3cc4b68053bd6685357a1efa2ce7335e7ff6502b42f7fc36e0cf1"
+}

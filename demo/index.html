@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex,follow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<script src="sample-data.js"></script>
+  <meta charset="UTF-8">
+  <title>Sharpe — Dashboard</title>
+  <script src="extension/chart.min.js"></script>
+  <link rel="stylesheet" href="extension/dashboard.css">
+  <script src="extension/theme-init.js"></script>
+<link rel="stylesheet" href="embed.css"></head>
+<body>
+  <header class="header">
+    <div class="header-row">
+      <div class="logo">
+        <img src="extension/icons/icon48.png" class="logo-img" alt="Sharpe">
+        <span class="logo-text">Sharpe</span>
+      </div>
+      <div class="header-center" id="headerStats"></div>
+      <div class="header-right">
+        <button class="btn-icon" id="btnTheme" title="Toggle light/dark mode">
+          <svg id="themeIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
+        <button class="btn-icon" id="btnPrivacy" title="Hide sensitive figures">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+        <button class="btn-pro" id="btnPro" title="Sharpe Pro">PRO</button>
+        <button class="btn-refresh" id="btnRefresh"><span class="refresh-glyph" aria-hidden="true">↻</span><span class="refresh-label" id="btnRefreshLabel">Refresh</span><div class="status-dot" id="statusDot"></div></button>
+      </div>
+    </div>
+    <nav class="tab-bar" id="tabBar" style="display:none">
+      <button class="tab-btn" data-tab="today">Today</button>
+      <button class="tab-btn active" data-tab="portfolio">Portfolio</button>
+      <button class="tab-btn" data-tab="insights">Insights</button>
+      <button class="tab-btn" data-tab="simulation">Simulated performance</button>
+      <button class="tab-btn" data-tab="watchlist">Watchlist</button>
+      <button class="tab-btn" data-tab="dividends">Dividends</button>
+      <button class="tab-btn" data-tab="tax">Tax Reporting</button>
+    </nav>
+  </header>
+
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-spinner"></div>
+    <p id="loadingText">Loading your portfolio data...</p>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+    <p class="progress-label" id="progressLabel"></p>
+  </div>
+
+  <main class="main" id="mainContent" style="display:none">
+    <div id="portfolioWarning" style="display:none" class="portfolio-warning">
+      <span id="portfolioWarningText"></span>
+      <button id="portfolioWarningBtn" class="banner-action-btn" type="button"></button>
+    </div>
+
+    <div id="reviewPrompt" style="display:none" class="review-prompt">
+      <span class="review-prompt-text">Getting something out of Sharpe? A review helps other DEGIRO investors find it.</span>
+      <a id="reviewPromptGo" class="btn btn--sm" href="https://chromewebstore.google.com/detail/sharpe-portfolio-analytic/jfkggpahncfpbeeiiadiblbifjnbdlfp/reviews" target="_blank" rel="noopener">Write a review</a>
+      <button id="reviewPromptNo" class="btn btn--sm" type="button">No thanks</button>
+    </div>
+
+    <!-- ═══ Tab: Today ═══ -->
+    <div class="tab-pane" id="tabToday">
+      <div class="card card--full" id="todayStatsCard">
+        <div class="card-header">
+          <div class="card-title">Daily Stats</div>
+          <div class="today-header-actions">
+            <div class="today-status-inline" id="todayStatusInline"></div>
+            <div class="today-date-picker-wrap">
+              <button type="button" id="todayDateBtn" class="period-select today-date-btn" aria-haspopup="dialog" aria-expanded="false" title="Choose day"></button>
+              <div id="todayDatePopover" class="today-date-popover" hidden role="dialog" aria-label="Select date">
+                <div class="today-cal-head">
+                  <button type="button" class="today-cal-nav" id="todayCalPrev" aria-label="Previous month">‹</button>
+                  <div class="today-cal-title-row">
+                    <span id="todayCalMonthLabel" class="today-cal-month"></span>
+                    <select id="todayCalYearSelect" class="period-select today-cal-year-select" aria-label="Year"></select>
+                  </div>
+                  <button type="button" class="today-cal-nav" id="todayCalNext" aria-label="Next month">›</button>
+                </div>
+                <div class="today-cal-weekdays" aria-hidden="true">
+                  <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                </div>
+                <div id="todayCalGrid" class="today-cal-grid"></div>
+              </div>
+            </div>
+            <button id="todayJumpNow" class="btn btn--sm" type="button" title="Jump to live today view">Today</button>
+          </div>
+        </div>
+        <div id="todayStatsContent"></div>
+
+        <div id="todayLivePanels" class="today-live-grid" hidden>
+          <section class="today-live-panel" aria-labelledby="todayPulseTitle">
+            <div class="today-live-head"><h3 id="todayPulseTitle">Portfolio Pulse</h3><span class="today-live-status" id="todayLiveStatus" role="status">Connecting…</span></div>
+            <div class="today-live-summary"><span id="todayLiveTotal" class="today-live-total sensitive">—</span><span class="today-live-caption">Since refresh · EUR</span></div>
+            <div class="today-live-chart"><canvas id="todayLiveChart" class="sensitive" role="img" aria-label="Portfolio change at each two-second reading; green gains and red losses"></canvas><p id="todayLiveEmpty" class="today-live-empty">Keep DEGIRO's portfolio open and logged in to follow updates.</p></div>
+          </section>
+          <section class="today-live-panel" aria-labelledby="todayContributorsTitle">
+            <div class="today-live-head"><h3 id="todayContributorsTitle">What's moving your day</h3><button type="button" class="btn btn--sm" id="todayLivePause" aria-pressed="false">Pause</button></div>
+            <p class="today-live-caption">Largest day contributions · EUR · select a holding</p>
+            <div id="todayLiveContributors" class="today-live-contributors"></div>
+            <p id="todayLiveContributorsEmpty" class="today-live-empty-inline">Waiting for a complete portfolio observation.</p>
+            <div class="today-live-event sensitive" id="todayLiveEvent">Changes will appear here as DEGIRO updates.</div>
+          </section>
+        </div>
+      </div>
+
+      <!-- One dataset, one card. Table / Waterfall / Heatmap are three
+           projections of the same `items` array, so they are view modes
+           rather than three stacked cards. -->
+      <div class="card card--full" id="todayMoversCard">
+        <div class="card-header">
+          <div class="card-title">Today's Movers</div>
+          <div class="today-total" id="todayTotal"></div>
+          <div class="seg" id="todayViewToggle">
+            <button class="seg-btn active" type="button" data-view="table">Table</button>
+            <button class="seg-btn" type="button" data-view="waterfall">Waterfall</button>
+            <button class="seg-btn" type="button" data-view="heatmap">Heatmap</button>
+          </div>
+          <select id="heatmapGroupBy" class="select" style="display:none" title="Group the heatmap">
+            <option value="none">No grouping</option>
+            <option value="assetclass">Asset Type</option>
+            <option value="geography">Geography</option>
+          </select>
+        </div>
+        <div id="todayViewBody">
+          <div id="todayTableContent" class="today-view" data-view="table">
+            <div class="table-scroll">
+              <table class="positions-table" id="todayTable" style="display:none">
+                <thead><tr>
+                  <th data-col="name">Name</th>
+                  <th data-col="price" class="num">Price</th>
+                  <th data-col="dayPct" class="num">Day %</th>
+                  <th data-col="dayEur" class="num">Day €</th>
+                  <th data-col="weight" class="num">Weight</th>
+                  <th data-col="contrib" class="num">Contrib.</th>
+                  <th data-col="totalPl" class="num">Total P&L</th>
+                  <th data-col="totalPlPct" class="num">Total %</th>
+                </tr></thead>
+                <tbody id="todayBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div id="todayWaterfallView" class="today-view" data-view="waterfall" style="display:none">
+            <div class="chart-wrap" style="height:300px">
+              <canvas id="todayWaterfallChart"></canvas>
+            </div>
+          </div>
+          <div id="todayHeatmapView" class="today-view" data-view="heatmap" style="display:none">
+            <div id="sectorHeatmapContent"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Tab: Portfolio ═══ -->
+    <div class="tab-pane active" id="tabPortfolio">
+      <div class="grid-top">
+        <!-- One performance story. "Cumulative" is the TWR line, "Daily" is the
+             per-day bar chart that used to live in its own Recent Activity card
+             below — same question, so one chart with two modes and one period. -->
+        <div class="card card--wide">
+          <div class="card-header">
+            <div class="card-title">Performance</div>
+            <div class="card-subtitle" id="perfSubtitle"></div>
+            <div class="perf-controls">
+              <div class="alloc-toggle" id="perfModeToggle">
+                <button class="toggle-btn active" type="button" data-perfmode="cum">Cumulative</button>
+                <button class="toggle-btn" type="button" data-perfmode="daily">Daily</button>
+              </div>
+              <div class="alloc-toggle" id="perfToggle">
+                <button class="toggle-btn active" type="button" data-mode="pct" title="Show return in %">%</button>
+                <button class="toggle-btn" type="button" data-mode="eur" title="Show value in €">€</button>
+              </div>
+              <select id="periodSelect" class="period-select" title="Chart window"></select>
+              <div class="bm-dropdown-wrap" id="bmDropdownWrap">
+                <button class="btn btn--sm" id="bmDropdownBtn" type="button" title="Benchmarks and trade markers">
+                  Overlays
+                  <svg viewBox="0 0 10 6" fill="currentColor"><path d="M0 0l5 6 5-6z"/></svg>
+                </button>
+                <div class="bm-dropdown-menu" id="bmDropdownMenu">
+                  <div class="bm-dropdown-item active" data-benchmark="sp500">
+                    <span class="bm-check"></span>
+                    <span class="bm-swatch" style="background:var(--bm-sp500)"></span>
+                    S&amp;P 500
+                  </div>
+                  <div class="bm-dropdown-item" data-benchmark="eurostoxx">
+                    <span class="bm-check"></span>
+                    <span class="bm-swatch" style="background:var(--bm-eurostoxx)"></span>
+                    STOXX Europe 600
+                  </div>
+                  <div class="bm-dropdown-item" data-benchmark="nasdaq">
+                    <span class="bm-check"></span>
+                    <span class="bm-swatch" style="background:var(--bm-nasdaq)"></span>
+                    Nasdaq 100
+                  </div>
+                  <div class="bm-dropdown-sep"></div>
+                  <div class="bm-dropdown-item" data-overlay="trades">
+                    <span class="bm-check"></span>
+                    ⇅ Trade markers
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="chart-wrap perf-chart-wrap">
+            <canvas id="performanceChart"></canvas>
+            <button id="btnResetZoom" class="btn btn--sm chart-reset" type="button" style="display:none" title="Reset to selected period">✕ Reset zoom</button>
+          </div>
+          <div class="perf-footline" id="perfFootline"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Allocation</div></div>
+          <div class="alloc-viz" id="allocationChart">
+            <div class="alloc-stackbar" id="allocStackBar"></div>
+            <div class="alloc-drill-head" id="allocDrillHead" style="display:none"></div>
+            <div class="alloc-rows" id="allocationLegend"></div>
+            <div class="alloc-callout" id="allocCallout" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card--full">
+        <div class="card-header">
+          <div class="card-title">Positions</div>
+          <div class="alloc-toggle" id="positionsTabToggle">
+            <button class="toggle-btn active" data-tab="open">Open</button>
+            <button class="toggle-btn" data-tab="closed">Closed</button>
+          </div>
+        </div>
+        <!-- Big Movers used to be six tiles on a card 567px above this table, and
+             clicking one only ever scrolled you down to these rows. Same click,
+             no journey. -->
+        <div class="movers-chips" id="moversChips"></div>
+        <table class="positions-table" id="positionsTable">
+          <thead><tr>
+            <th data-col="name">Name</th><th data-col="weight">Weight</th><th data-col="spark">30D</th><th data-col="price">Price</th><th data-col="value">Value</th><th data-col="pl">P&amp;L</th><th data-col="plpct">P&amp;L %</th>
+          </tr></thead>
+          <tbody id="positionsBody"></tbody>
+        </table>
+        <table class="positions-table" id="closedPositionsTable" style="display:none">
+          <thead><tr>
+            <th data-col="name">Name</th><th data-col="currency">Currency</th><th data-col="sold">Shares sold</th><th data-col="avgBuy">Avg buy</th><th data-col="avgSell">Avg sell</th><th data-col="pl">Realized P&amp;L</th><th data-col="plpct">P&amp;L %</th>
+          </tr></thead>
+          <tbody id="closedPositionsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="tabSimulation">
+      <div class="card sim-card" id="simulationCard">
+        <div class="card-header"><div><div class="card-title">Simulated performance</div><p class="sim-intro">Explore how regular investing could change your portfolio over time.</p></div></div>
+        <div id="simPreview" class="sim-preview" hidden>
+          <p>Illustrative preview · not your portfolio</p>
+          <svg viewBox="0 0 800 220" role="img" aria-label="Illustration of a widening range of simulated portfolio values"><path d="M0 205 Q400 180 800 25 L800 155 Q400 205 0 205" fill="currentColor" opacity=".12"/><path d="M0 205 Q400 185 800 90" fill="none" stroke="currentColor" stroke-width="3"/></svg>
+        </div>
+        <div id="simWorkspace" hidden>
+          <div class="sim-layout">
+            <aside class="sim-inputs" aria-label="Investment plan">
+              <div class="sim-start-label">Starting portfolio</div><div id="simStarting" class="sim-start sensitive">—</div><p id="simSync" class="sim-caption"></p>
+              <label class="sim-label" for="simAmount">Recurring budget (€)</label><input id="simAmount" class="sim-input sensitive" type="number" min="0" step="0.01" value="0" inputmode="decimal">
+              <label class="sim-label" for="simEvery">Invest every N months</label><input id="simEvery" class="sim-input" type="number" min="1" max="360" step="1" value="1" inputmode="numeric">
+              <div id="simPresets" class="sim-presets" aria-label="Contribution frequency presets"><button type="button" data-months="1" aria-pressed="true">Monthly</button><button type="button" data-months="3" aria-pressed="false">Quarterly</button><button type="button" data-months="12" aria-pressed="false">Annually</button></div>
+              <div class="sim-allocation-head"><span>Split new contributions</span><span id="simAllocationTotal">100%</span></div>
+              <div class="sim-allocation-actions">
+                <button id="simClearAllocation" class="btn btn--sm" type="button">Clear all</button>
+                <button id="simPortfolioAllocation" class="btn btn--sm" type="button" title="Match the latest synced holding values, excluding cash">Use portfolio split</button>
+              </div>
+              <div id="simAllocations"></div>
+              <p class="sim-caption">Unselected holdings stay invested. New money follows this split; existing holdings are not rebalanced.</p>
+              <button id="simRun" class="btn sim-run" type="button">Run simulation</button>
+              <p id="simStatus" class="sim-status" role="status" aria-live="polite"></p>
+              <button id="simRetry" class="btn btn--sm" type="button" hidden>Retry history</button>
+            </aside>
+            <section class="sim-output" aria-label="Simulation results">
+              <div class="sim-result-head"><div><span class="sim-caption">Portfolio value · EUR</span><h3 id="simResultTitle">Your possible paths</h3></div><label class="sim-horizon-label" for="simHorizon">Horizon<select id="simHorizon" class="sim-input"><option value="1">1 year</option><option value="3">3 years</option><option value="5">5 years</option><option value="10" selected>10 years</option><option value="20">20 years</option><option value="30">30 years</option></select></label></div>
+              <p id="simStale" class="sim-stale" role="status" hidden>Results are outdated. Run again to apply your changes.</p>
+              <div class="sim-chart-wrap"><canvas id="simChart" class="sensitive" role="img" aria-label="Simulated portfolio value, percentile range, and starting value plus contributions"></canvas><div id="simEmpty" class="sim-empty">Set your contribution plan, then run a simulation.</div></div>
+              <div class="sim-legend"><span><i class="sim-legend-median"></i>Median</span><span><i class="sim-legend-band"></i>10th–90th percentiles</span><span><i class="sim-legend-baseline"></i>Starting value + contributions</span></div>
+              <p class="sim-caption">The shaded range describes these simulations, not a guaranteed probability range. Future outcomes can fall outside it.</p>
+              <div class="sim-table-wrap" id="simTableWrap" hidden><table class="positions-table sim-table"><caption>Outcomes from the same simulation run</caption><thead><tr><th>Years</th><th>Added contributions</th><th>Median final value</th><th>Median gain</th><th>10th–90th percentiles</th></tr></thead><tbody id="simResults"></tbody></table></div>
+              <p id="simRunSummary" class="sim-caption"></p>
+            </section>
+          </div>
+          <details class="sim-assumptions" id="simAssumptions"><summary>Assumptions &amp; history coverage</summary>
+            <p>2,000 historical simulations sample shared three-month circular blocks across your holdings. Existing cash stays at zero growth. Each scheduled contribution is invested after that month's return; the first occurs after N months. Investment amounts may be fractional.</p>
+            <p>Exchange rates stay constant. Dividends, taxes, fees, and inflation are not added separately. Inputs are provider price returns; their adjustment treatment is not verified. Extrapolating recent history over decades is a substantial assumption, not a forecast or investment recommendation.</p>
+            <p>At least 36 consecutive shared completed months are required, from up to five years of price history. A proxy replaces a holding's entire return history, never its starting value. Choose proxies explicitly and review their suitability.</p>
+            <p id="simCoverageSummary" class="sim-caption"></p><div id="simCoverage" class="sim-coverage"></div>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Tab: Insights ═══ -->
+    <div class="tab-pane" id="tabInsights">
+      <!-- Pulse and the stat tiles used to be two cards restating each other.
+           One card now: the figures, then only the observations that no tile
+           already carries. -->
+      <div class="card card--full" id="pulseCard">
+        <div class="card-header">
+          <div class="card-title">Portfolio Pulse</div>
+          <div class="card-subtitle">Your all-time figures, and what stands out in them · not advice</div>
+        </div>
+        <div id="moreInfoContent" class="more-info-content">
+          <div class="more-info-grid" id="moreInfoGrid">
+            <!-- Populated by JS -->
+          </div>
+          <div id="moreInfoChartWrap" class="more-info-chart-wrap" style="display:none">
+            <canvas id="moreInfoChart"></canvas>
+          </div>
+          <div class="more-info-note" id="moreInfoNote"></div>
+        </div>
+        <div id="pulseList" class="pulse-list"></div>
+      </div>
+
+      <div class="card card--full insight-collapsible collapsed" id="portfolioGradeCard">
+        <div class="card-header insight-head" role="button" tabindex="0" aria-expanded="false">
+          <div class="card-title">Rate My Portfolio</div>
+          <div class="insight-summary" id="gradeSummary">5 quick questions · rate your portfolio against your goals</div>
+          <span class="insight-chevron" aria-hidden="true">▸</span>
+        </div>
+        <div class="insight-collapsible-body">
+          <div id="gradeContent">
+            <!-- Survey phase -->
+            <div id="gradeSurvey" class="grade-survey">
+              <p class="grade-survey-intro">Answer 5 quick questions so we can evaluate your portfolio against your goals. Everything stays on your machine.</p>
+              <div class="grade-sliders">
+                <div class="grade-slider-row">
+                  <div class="grade-slider-header">
+                    <span class="grade-slider-label">Risk Tolerance</span>
+                    <span class="grade-slider-value" id="sliderValRisk">5</span>
+                  </div>
+                  <div class="grade-slider-anchors"><span>Conservative</span><span>Aggressive</span></div>
+                  <input type="range" min="1" max="10" value="5" class="grade-range" id="sliderRisk">
+                  <div class="grade-slider-desc" id="sliderDescRisk"></div>
+                </div>
+                <div class="grade-slider-row">
+                  <div class="grade-slider-header">
+                    <span class="grade-slider-label">Involvement</span>
+                    <span class="grade-slider-value" id="sliderValInvolvement">5</span>
+                  </div>
+                  <div class="grade-slider-anchors"><span>Passive investor</span><span>Active day trader</span></div>
+                  <input type="range" min="1" max="10" value="5" class="grade-range" id="sliderInvolvement">
+                  <div class="grade-slider-desc" id="sliderDescInvolvement"></div>
+                </div>
+                <div class="grade-slider-row">
+                  <div class="grade-slider-header">
+                    <span class="grade-slider-label">Investment Goal</span>
+                    <span class="grade-slider-value" id="sliderValGoal">5</span>
+                  </div>
+                  <div class="grade-slider-anchors"><span>Steady income</span><span>Long-term wealth</span></div>
+                  <input type="range" min="1" max="10" value="5" class="grade-range" id="sliderGoal">
+                  <div class="grade-slider-desc" id="sliderDescGoal"></div>
+                </div>
+                <div class="grade-slider-row">
+                  <div class="grade-slider-header">
+                    <span class="grade-slider-label">Time Horizon</span>
+                    <span class="grade-slider-value" id="sliderValHorizon">5</span>
+                  </div>
+                  <div class="grade-slider-anchors"><span>1–2 years</span><span>20+ years</span></div>
+                  <input type="range" min="1" max="10" value="5" class="grade-range" id="sliderHorizon">
+                  <div class="grade-slider-desc" id="sliderDescHorizon"></div>
+                </div>
+                <div class="grade-slider-row">
+                  <div class="grade-slider-header">
+                    <span class="grade-slider-label">Complexity Preference</span>
+                    <span class="grade-slider-value" id="sliderValComplexity">5</span>
+                  </div>
+                  <div class="grade-slider-anchors"><span>Keep it simple</span><span>Fine with complexity</span></div>
+                  <input type="range" min="1" max="10" value="5" class="grade-range" id="sliderComplexity">
+                  <div class="grade-slider-desc" id="sliderDescComplexity"></div>
+                </div>
+              </div>
+              <button class="grade-submit-btn" id="btnGradeSubmit">Rate My Portfolio</button>
+            </div>
+            <!-- Results phase -->
+            <div id="gradeResults" class="grade-results" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card--full insight-collapsible collapsed" id="correlationCard">
+        <div class="card-header insight-head" role="button" tabindex="0" aria-expanded="false">
+          <div class="card-title" id="corrInfoIcon">Correlation Matrix</div>
+          <div class="insight-summary" id="correlationSubtitle">How closely your holdings move together</div>
+          <span class="insight-chevron" aria-hidden="true">▸</span>
+        </div>
+        <div class="insight-collapsible-body">
+          <div id="correlationContent">
+            <div id="correlationHeatmap" class="correlation-wrap"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card--full insight-collapsible collapsed" id="stressTestCard">
+        <div class="card-header insight-head" role="button" tabindex="0" aria-expanded="false">
+          <div class="card-title">Risk Analysis</div>
+          <div class="insight-summary" id="stressSummary">Value at Risk and scenario stress tests</div>
+          <span class="insight-chevron" aria-hidden="true">▸</span>
+        </div>
+        <div class="insight-collapsible-body">
+          <div id="stressTestContent">
+            <div id="stressTestResults"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Tab: Watchlist ═══ -->
+    <div class="tab-pane" id="tabWatchlist">
+      <div id="watchlistEmpty" style="display:none"></div>
+      <div class="card card--full" id="watchlistChartCard">
+        <div class="card-header">
+          <div class="card-title">Watchlist Performance</div>
+          <div class="perf-controls">
+            <select id="watchlistPeriod" class="period-select" title="Applies to the chart and the table below">
+              <option value="1M">1M</option>
+              <option value="6M">6M</option>
+              <option value="YTD">YTD</option>
+              <option value="1Y" selected>1Y</option>
+              <option value="3Y">3Y</option>
+              <option value="5Y">5Y</option>
+            </select>
+          </div>
+        </div>
+        <div id="wlChartReturn" class="wl-chart-return"></div>
+        <div class="chart-wrap" style="height:300px">
+          <canvas id="watchlistChart"></canvas>
+        </div>
+        <div id="wlVsPortfolioStats" class="wl-comparison-stats" style="display:none"></div>
+      </div>
+      <div class="card card--full" id="watchlistTableCard">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Favourites</div>
+            <div class="card-subtitle" style="color:var(--muted);font-size:11px">Items you're watching on DEGIRO</div>
+          </div>
+        </div>
+        <div id="watchlistContent">
+          <div class="table-scroll">
+            <table class="positions-table" id="watchlistTable" style="display:none">
+              <thead><tr>
+                <th data-col="name">Name</th>
+                <th data-col="currency">Ccy</th>
+                <th data-col="price" class="num">Price</th>
+                <th data-col="ret" class="num">Return</th>
+                <th data-col="vol" class="num">Volatility</th>
+                <th data-col="corr" class="num">Corr.</th>
+                <th data-col="signal" class="num"><span class="th-with-tip" data-tip="Based on SMA(50) vs SMA(200) crossover. Bullish = short-term trend above long-term. Bearish = below. Neutral = within 1%.">Signal</span></th>
+              </tr></thead>
+              <tbody id="watchlistBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="card card--full" id="wlStockChartCard" style="display:none">
+        <div class="card-header">
+          <div class="card-title" id="wlStockTitle"></div>
+          <button class="btn-icon" id="wlStockClose" title="Close">&times;</button>
+        </div>
+        <div class="chart-wrap" style="height:260px">
+          <canvas id="wlStockChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Tab: Dividends ═══ -->
+    <div class="tab-pane" id="tabDividends">
+      <div id="dividendsEmpty" style="display:none"></div>
+      <div class="card card--full" id="divStatsCard">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Dividend Income</div>
+            <div class="card-subtitle" style="color:var(--muted);font-size:11px">Gross payments received · before withholding tax</div>
+          </div>
+        </div>
+        <div class="more-info-grid" id="divStatsGrid"></div>
+      </div>
+      <div class="card card--full" id="divChartCard">
+        <div class="card-header">
+          <div class="card-title">Monthly Dividends</div>
+          <div class="card-subtitle">Last 12 months</div>
+        </div>
+        <div class="chart-wrap" style="height:220px"><canvas id="dividendChart"></canvas></div>
+        <div id="divNextEstimate" class="div-next-estimate" style="display:none"></div>
+      </div>
+      <div class="card card--full" id="divHoldingsCard">
+        <div class="card-header">
+          <div class="card-title">Per-Holding Breakdown</div>
+        </div>
+        <div id="divHoldingsContent"></div>
+      </div>
+    </div>
+
+    <!-- ═══ Tab: Tax Reporting ═══ -->
+    <div class="tab-pane" id="tabTax">
+      <div class="card card--full" id="taxReportCard">
+        <div class="card-header">
+          <div class="card-title">Tax Reporting</div>
+          <div class="card-subtitle">Generate tax tables from your DEGIRO history</div>
+        </div>
+        <div id="taxReportContent"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="dashboard-footer">
+    <span>Not financial advice</span>
+    <span> — </span>
+    <span><a href="https://docs.google.com/forms/d/e/1FAIpQLSdX4zvs9scwN4faCd2bnE-F4jqeqhIQ5IuJD7EUlNlaMYXDqg/viewform?usp=publish-editor" class="footer-link">Feedback</a></span>
+    <span> — </span>
+    <span><a href="https://chromewebstore.google.com/detail/sharpe-portfolio-analytic/jfkggpahncfpbeeiiadiblbifjnbdlfp/reviews" class="footer-link" target="_blank" rel="noopener">Write a review</a></span>
+  </footer>
+
+  <script src="extension/utils.js"></script>
+  <script src="extension/pro.js"></script>
+  <script src="extension/dashboard.js"></script>
+  <script src="extension/today-live-model.js"></script>
+  <script src="extension/today-live.js"></script>
+  <script src="extension/simulation-core.js"></script>
+  <script src="extension/simulation.js"></script>
+<script src="embed.js"></script></body>
+</html>
