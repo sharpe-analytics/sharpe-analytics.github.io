@@ -15,12 +15,11 @@
 .native-preview{width:100%;min-width:0}.native-stage{position:relative;width:100%;overflow:hidden;background:#0d141b;border:1px solid #344552;border-radius:10px;box-shadow:0 18px 50px #17263c20}.native-stage iframe{display:block;position:absolute;top:0;left:0;transform-origin:top left;border:0;background:#0d141b}.native-caption{font-size:12px!important;line-height:1.6;color:var(--muted);margin-top:14px;text-align:center}.native-caption a{white-space:nowrap}.hero-product:has(.native-preview) .native-caption{text-align:left}.native-preview+.native-preview{display:none}
 @media(max-width:700px){.home-destinations{grid-template-columns:1fr}.page-intro{padding-block:40px 25px}.page-intro>p{font-size:16px}.native-caption{font-size:11px!important}}
 
-/* One attributed review, separate from any aggregate store rating. */
-.hero-review{display:flex;gap:12px;align-items:center;margin-bottom:24px;text-decoration:none;color:var(--ink,#18263b);font-size:14px;font-weight:600}
-.review-stars{color:#946500;letter-spacing:2px;font-size:22px;white-space:nowrap}
-.hero-review small{display:block;font-size:11px;font-weight:400;color:#51617a;margin-top:3px}
-.hero-review:hover span:last-child{text-decoration:underline}
-.reader-review{display:grid;grid-template-columns:1fr 1.3fr;gap:36px;align-items:center;padding-top:32px;padding-bottom:48px}
-.reader-review h2{font-size:26px;line-height:1.2;margin:8px 0 12px}.reader-review p{font-size:14px}
-.reader-review figure{margin:0;min-width:0}.reader-review img{width:100%;height:auto;border-radius:12px;display:block}.reader-review figcaption{font-size:11px;color:#51617a;margin-top:10px}
-@media(max-width:767px){.reader-review{grid-template-columns:1fr;gap:20px}.hero-review{gap:8px}.review-stars{font-size:19px}.hero-review small{font-size:10px}}
+/* The avatar is an unaltered crop of the original Chrome Store screenshot. */
+.hero-review{display:flex;gap:14px;align-items:center;margin-top:26px;color:var(--ink);font-size:14px}
+.review-avatar{display:block;position:relative;width:44px;height:44px;flex:0 0 44px;overflow:hidden;border-radius:50%}
+.review-avatar img{position:absolute;width:510px!important;max-width:none!important;height:124px!important;left:-24px;top:-24px}
+.review-stars{display:block;color:#946500;letter-spacing:2px;font-size:20px;line-height:1.2;white-space:nowrap}
+.hero-review .review-quote{margin:6px 0;font-size:15px;font-weight:600;line-height:1.4}
+.hero-review a{display:block;font-size:11px;line-height:1.6;color:var(--muted);text-decoration:none}
+.hero-review a:hover{text-decoration:underline}.hero-review .review-capture{font-size:10px;margin-top:3px;text-decoration:underline}
