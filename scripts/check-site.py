@@ -9,7 +9,7 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'https://sharpe-analytics.github.io'
-PAGES = [ROOT / 'index.html', *sorted((ROOT / 'guides').glob('*/index.html'))]
+PAGES = [ROOT / 'index.html', *sorted(ROOT.glob('*/index.html')), *sorted((ROOT / 'guides').glob('*/index.html'))]
 errors = []
 class Page(HTMLParser):
     def __init__(self, text):
